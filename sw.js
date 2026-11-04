@@ -1,6 +1,6 @@
 // Service worker: guarda o app para funcionar offline (o reconhecimento pela
 // câmera ainda baixa os modelos do MediaPipe na primeira vez).
-const CACHE = 'ponte-libras-v2';
+const CACHE = 'ponte-libras-v3';
 const ARQUIVOS = [
   './', 'index.html', 'captura.html', 'manifest.webmanifest', 'css/style.css',
   'js/app.js', 'js/captura.js', 'js/config.js',

@@ -186,3 +186,8 @@ main[data-tela="libras"] .camera-box, main[data-tela="treinar"] .camera-box { di
 .legenda .glosa { font-size: .72rem; font-weight: 700; }
 .check { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
 a.btn { text-decoration: none; }
+
+.tete-carregando {
+  position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 16px;
+  color: var(--muted); font-weight: 700; z-index: 1;
+}

@@ -16,7 +16,9 @@ import { criarDetalhes } from './detalhes.js';
 
 export function criarTete(container, { aoMarcar, base } = {}) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // celulares (tela de toque): resolução e sombras um pouco menores para manter a fluidez
+  const movel = window.matchMedia?.('(pointer: coarse)').matches;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, movel ? 1.5 : 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.95;
@@ -35,7 +37,7 @@ export function criarTete(container, { aoMarcar, base } = {}) {
   const principal = new THREE.DirectionalLight(0xfff0e0, 1.6);
   principal.position.set(1.0, 2.4, 2.4);
   principal.castShadow = true;
-  principal.shadow.mapSize.set(2048, 2048);
+  principal.shadow.mapSize.set(movel ? 1024 : 2048, movel ? 1024 : 2048);
   Object.assign(principal.shadow.camera, { left: -0.6, right: 0.6, top: 2.0, bottom: 0.7, near: 0.5, far: 6 });
   principal.shadow.bias = -0.0003;
   principal.shadow.normalBias = 0.003;
@@ -55,11 +57,21 @@ export function criarTete(container, { aoMarcar, base } = {}) {
   cena.add(ossos.hips.parent);
   const mat = criarMateriais();
   let rosto = null;
+  // aviso enquanto o modelo baixa (pode levar alguns segundos no 4G)
+  const aviso = document.createElement('div');
+  aviso.className = 'tete-carregando';
+  aviso.setAttribute('role', 'status');
+  aviso.textContent = 'Carregando a Teté…';
+  container.appendChild(aviso);
   const pronto = carregarMalhas(ossos, mat, base).then((malhas) => {
     rosto = criarRosto(ossos.head, mat);
     ossos.head.add(criarCachos(malhas.cabelo, mat));
     criarDetalhes(ossos, mat);
+    aviso.remove();
     return malhas;
+  }, (erro) => {
+    aviso.textContent = 'Não consegui carregar a Teté. Verifique a conexão e recarregue a página.';
+    throw erro;
   });
 
   function enquadrar() {
