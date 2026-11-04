@@ -1,7 +1,7 @@
 // Banco de sinais: dicionário (dados/dicionario.json) + animações capturadas
 // dos vídeos da modelo (dados/sinais/<id>.json ou salvas neste aparelho).
 
-import { clipDatilologia, sinaisProcedurais } from '../avatar3d/solver.js';
+import { clipDatilologia, sinaisProcedurais } from '../movimento/solver.js';
 import { paraGlosas } from './glosa.js';
 
 const CHAVE_LOCAL = 'libras-animacoes-v1';

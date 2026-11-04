@@ -1,8 +1,8 @@
 <!doctype html><meta charset="utf-8"><title>Teste do retargeting</title><body style="font-family:monospace"><h1>Teste: retargeting MediaPipe → Lia</h1><p>Gera landmarks sintéticos a partir de poses conhecidas, reconstrói pela captura e mede o erro.</p><pre id="o"></pre><script type="module">
 import * as THREE from '../js/vendor/three.module.min.js';
-import { criarEsqueleto } from '../js/avatar3d/rig.js';
-import { resolverPose } from '../js/avatar3d/solver.js';
-import { quadroDeDeteccao } from '../js/avatar3d/retarget.js';
+import { criarEsqueleto } from '../js/movimento/rig.js';
+import { resolverPose } from '../js/movimento/solver.js';
+import { quadroDeDeteccao } from '../js/movimento/retarget.js';
 const out=[];
 const casos = {
   V_erguido: { right: { alvo:[-0.17,1.39,0.23], dedos:[0,1,0], palma:[0,0,1], mao:'V' } },

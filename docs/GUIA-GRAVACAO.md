@@ -1,8 +1,8 @@
 # Guia de gravação dos sinais (intérprete-modelo)
 
-Os vídeos gravados pela intérprete são convertidos em animações 3D da Lia pelo
+Os vídeos gravados pela intérprete são convertidos em animações 3D da Teté pelo
 **Estúdio de captura** (`captura.html`). Quanto melhor o vídeo, mais fiel e
-fluido o sinal da Lia.
+fluido o sinal da Teté.
 
 ## Antes de começar
 
@@ -33,7 +33,7 @@ fluido o sinal da Lia.
 
 ## Ordem sugerida
 
-1. **Alfabeto manual** (`LETRA-A` … `LETRA-Z`, `LETRA-Ç`). Substitui o alfabeto gerado por código, usado sempre que a Lia soletra.
+1. **Alfabeto manual** (`LETRA-A` … `LETRA-Z`, `LETRA-Ç`). Substitui o alfabeto gerado por código, usado sempre que a Teté soletra.
 2. **Números** de 0 a 10.
 3. **Saudações e cortesia:** OI, TCHAU, BOM-DIA, BOA-TARDE, BOA-NOITE, TUDO-BEM, OBRIGADO, DESCULPA, POR-FAVOR.
 4. **Comunicação:** EU, VOCÊ, NOME, SURDO, OUVINTE, LIBRAS, ENTENDER, REPETIR, DEVAGAR, ESCREVER, ESPERAR.
@@ -45,13 +45,13 @@ fluido o sinal da Lia.
 
 1. Abra `captura.html` → **Escolher vídeo**.
 2. **Glosa**: o nome do arquivo (ex.: `OBRIGADO`). **Palavras**: as formas em português que devem ativar o sinal (`obrigado, obrigada, valeu`).
-3. **Gerar animação 3D** e compare a Lia com o vídeo, lado a lado.
+3. **Gerar animação 3D** e compare a Teté com o vídeo, lado a lado.
 4. Se estiver bom: **Salvar neste aparelho** (teste no app) e **Baixar .json** (para publicar).
 5. Publicar: copie o `.json` para `dados/sinais/` e adicione `"animacao": "dados/sinais/obrigado.json"` na entrada do dicionário.
 
 ## Problemas comuns
 
-| Sintoma na Lia | Causa provável | Solução |
+| Sintoma na Teté | Causa provável | Solução |
 |---|---|---|
 | Mão “tremendo” | pouca luz ou desfoque de movimento | mais luz, 60 fps |
 | Dedos errados por alguns quadros | mão de perfil ou uma mão cobrindo a outra | gire o corpo uns 15° ou grave de novo |

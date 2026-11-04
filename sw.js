@@ -1,10 +1,12 @@
 // Service worker: guarda o app para funcionar offline (o reconhecimento pela
 // câmera ainda baixa os modelos do MediaPipe na primeira vez).
-const CACHE = 'ponte-libras-v1';
+const CACHE = 'ponte-libras-v2';
 const ARQUIVOS = [
   './', 'index.html', 'captura.html', 'manifest.webmanifest', 'css/style.css',
   'js/app.js', 'js/captura.js', 'js/config.js',
-  'js/avatar3d/avatar.js', 'js/avatar3d/rig.js', 'js/avatar3d/pose.js', 'js/avatar3d/solver.js', 'js/avatar3d/retarget.js',
+  'js/movimento/motor.js', 'js/movimento/rig.js', 'js/movimento/pose.js', 'js/movimento/solver.js', 'js/movimento/retarget.js',
+  'js/tete3d/tete.js', 'js/tete3d/carregar.js', 'js/tete3d/escultura.js', 'js/tete3d/sdf.js', 'js/tete3d/materiais.js',
+  'js/tete3d/rosto.js', 'js/tete3d/cachos.js', 'js/tete3d/detalhes.js', 'assets/tete/tete.json', 'assets/tete/tete.bin',
   'js/libras/glosa.js', 'js/libras/fala.js', 'js/libras/sinais.js', 'js/libras/reconhecedor.js',
   'js/vendor/three.module.min.js', 'dados/dicionario.json', 'assets/icone-192.png', 'assets/icone-512.png',
 ];

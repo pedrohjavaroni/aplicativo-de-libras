@@ -1,4 +1,4 @@
-import { criarAvatar3D } from './avatar3d/avatar.js';
+import { criarTete } from './tete3d/tete.js';
 import { falar, criarOuvinte, reconhecimentoDisponivel } from './libras/fala.js';
 import { carregarDicionario, mesclarLocais, obterDicionario, traduzir } from './libras/sinais.js';
 import {
@@ -8,7 +8,7 @@ import {
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
 
-// ------------------------------------------------------------- Lia --------
+// ------------------------------------------------------------ Teté --------
 const balao = $('#balao');
 const letreiro = $('#letreiro');
 let timerBalao;
@@ -17,11 +17,11 @@ function dizer(texto, { ms = 5000, voz = false } = {}) {
   balao.classList.remove('oculto');
   clearTimeout(timerBalao);
   if (ms) timerBalao = setTimeout(() => balao.classList.add('oculto'), ms);
-  if (voz) falarComLia(texto);
+  if (voz) falarComTete(texto);
 }
 
 let glosaAtualEl = null;
-const lia = criarAvatar3D($('#avatar'), {
+const tete = criarTete($('#avatar'), {
   aoMarcar(ev) {
     if (ev.tipo === 'inicio') {
       const el = ev.clip._chip;
@@ -45,8 +45,8 @@ function mostrarLetreiro(texto, sub) {
   letreiro.style.fontSize = texto.length > 3 ? '1.3rem' : '';
 }
 
-function falarComLia(texto) {
-  falar(texto, { aoIniciar: () => lia.falando(true), aoTerminar: () => lia.falando(false) });
+function falarComTete(texto) {
+  falar(texto, { aoIniciar: () => tete.falando(true), aoTerminar: () => tete.falando(false) });
 }
 
 const DICAS = [
@@ -57,18 +57,18 @@ const DICAS = [
 ];
 let dica = 0;
 $('#avatar').addEventListener('click', () => {
-  lia.gesto('explicar');
+  tete.gesto('explicar');
   dizer(DICAS[dica++ % DICAS.length]);
 });
 
 let vel = 1;
 $('#btnVelocidade').addEventListener('click', (e) => {
   vel = vel === 1 ? 0.7 : vel === 0.7 ? 1.3 : 1;
-  lia.velocidade(vel);
+  tete.velocidade(vel);
   e.currentTarget.textContent = `${vel}×`;
   dizer(vel < 1 ? 'Vou sinalizar mais devagar.' : vel > 1 ? 'Vou sinalizar mais rápido.' : 'Velocidade normal.', { ms: 2000 });
 });
-$('#btnPararAvatar').addEventListener('click', () => lia.parar());
+$('#btnPararAvatar').addEventListener('click', () => tete.parar());
 
 // --------------------------------------------------------- navegação ------
 const principal = $('#principal');
@@ -83,7 +83,7 @@ function irPara(tela) {
     libras: ['Pode sinalizar! Eu falo em voz alta para a pessoa ouvinte.', 'explicar'],
     treinar: ['Me ensine sinais: grave alguns exemplos de cada um.', 'explicar'],
   };
-  if (falas[tela]) { dizer(falas[tela][0]); lia.gesto(falas[tela][1]); }
+  if (falas[tela]) { dizer(falas[tela][0]); tete.gesto(falas[tela][1]); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 $$('[data-ir]').forEach((b) => b.addEventListener('click', () => irPara(b.dataset.ir)));
@@ -110,8 +110,8 @@ for (const f of FRASES) {
   b.textContent = f;
   b.addEventListener('click', () => {
     const texto = f.replace(/\((a|o)\)/g, '');
-    falarComLia(texto);
-    lia.gesto('explicar');
+    falarComTete(texto);
+    tete.gesto('explicar');
     dizer(`🔊 “${texto}”`, { ms: 4000 });
   });
   $('#frasesRapidas').append(b);
@@ -125,7 +125,7 @@ let ultimoTexto = '';
 async function sinalizarTexto(texto) {
   if (!texto.trim()) return;
   ultimoTexto = texto;
-  lia.parar();
+  tete.parar();
   const itens = await traduzir(texto);
   glosasEl.innerHTML = '';
   for (const it of itens) {
@@ -134,7 +134,7 @@ async function sinalizarTexto(texto) {
     chip.textContent = it.glosa;
     chip.title = { capturado: 'Sinal', procedural: 'Sinal', pendente: 'Sinal ainda não capturado — soletrado', datilologia: 'Soletrado (datilologia)' }[it.tipo];
     glosasEl.append(chip);
-    for (const c of it.clipes) { c._chip = chip; lia.tocar(c); }
+    for (const c of it.clipes) { c._chip = chip; tete.tocar(c); }
   }
 }
 
@@ -161,7 +161,7 @@ if (!reconhecimentoDisponivel) {
     aoMudarEstado(ativo) {
       btnOuvir.classList.toggle('gravando', ativo);
       btnOuvir.textContent = ativo ? '⏹ Parar de ouvir' : '🎤 Começar a ouvir';
-      if (ativo) { lia.gesto('ouvir'); dizer('Estou ouvindo…', { ms: 0 }); } else dizer('Parei de ouvir.', { ms: 2000 });
+      if (ativo) { tete.gesto('ouvir'); dizer('Estou ouvindo…', { ms: 0 }); } else dizer('Parei de ouvir.', { ms: 2000 });
     },
     aoErro(e) {
       if (e === 'not-allowed') dizer('Preciso de permissão para usar o microfone.');
@@ -234,7 +234,7 @@ async function ligarCamera() {
         $('#reconhecido').textContent = r.nome;
         frase.push(r.nome);
         atualizarFrase();
-        if ($('#falaAutomatica').checked) falarComLia(textoParaFala(r.nome));
+        if ($('#falaAutomatica').checked) falarComTete(textoParaFala(r.nome));
         dizer(`Você sinalizou: ${r.nome}`, { ms: 2500 });
       },
     });
@@ -258,7 +258,7 @@ function desligarCamera() {
 }
 $$('[data-acao="camera"]').forEach((b) => b.addEventListener('click', () => (stream ? desligarCamera() : ligarCamera())));
 
-$('#btnFalarFrase').addEventListener('click', () => frase.length && falarComLia(frase.map(textoParaFala).join(' ')));
+$('#btnFalarFrase').addEventListener('click', () => frase.length && falarComTete(frase.map(textoParaFala).join(' ')));
 $('#btnApagarUltimo').addEventListener('click', () => { frase.pop(); atualizarFrase(); });
 $('#btnLimparFrase').addEventListener('click', () => { frase.length = 0; atualizarFrase(); $('#reconhecido').textContent = '—'; });
 
@@ -307,7 +307,7 @@ $('#btnGravarExemplo').addEventListener('click', async (ev) => {
   modelo._limiar = limiar(modelo);
   const n = modelo.classes[nome].length;
   treinoStatus.textContent = `Exemplo ${n} de “${nome}” gravado.${n < 5 ? ' Grave mais alguns.' : ' Ótimo!'}`;
-  if (n === 5) { lia.gesto('comemorar'); dizer(`Aprendi o sinal ${nome}!`); }
+  if (n === 5) { tete.gesto('comemorar'); dizer(`Aprendi o sinal ${nome}!`); }
   atualizarListaSinais();
 });
 
@@ -339,8 +339,8 @@ $('#arquivoImportar').addEventListener('change', async (e) => {
   for (const e of obterDicionario()) { const o = document.createElement('option'); o.value = e.glosa; dl.append(o); }
   atualizarListaSinais();
   await esperar(400);
-  dizer('Oi! Eu sou a Lia 👋 Sou sua intérprete de Libras. Toque em mim para dicas.', { ms: 7000 });
-  lia.gesto('acenar');
+  dizer('Oi! Eu sou a Teté 👋 Sou sua intérprete de Libras. Toque em mim para dicas.', { ms: 7000 });
+  tete.gesto('acenar');
 })();
 
 if ('serviceWorker' in navigator && location.protocol === 'https:') {

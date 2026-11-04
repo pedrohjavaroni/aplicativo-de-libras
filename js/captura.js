@@ -1,6 +1,6 @@
-// Estúdio de captura: vídeo da intérprete → animação 3D da Lia.
-import { criarAvatar3D } from './avatar3d/avatar.js';
-import { associarMaos, quadroDeDeteccao, suavizar } from './avatar3d/retarget.js';
+// Estúdio de captura: vídeo da intérprete → animação 3D da Teté.
+import { criarTete } from './tete3d/tete.js';
+import { associarMaos, quadroDeDeteccao, suavizar } from './movimento/retarget.js';
 import { carregarVision, MEDIAPIPE } from './config.js';
 import { carregarDicionario, mesclarLocais, animacoesLocais, salvarAnimacaoLocal, removerAnimacaoLocal, animacaoParaClipe } from './libras/sinais.js';
 
@@ -13,12 +13,12 @@ const progresso = $('#progresso');
 const letreiro = $('#letreiro');
 let animacao = null;
 
-const lia = criarAvatar3D($('#avatar'), {
+const tete = criarTete($('#avatar'), {
   aoMarcar(ev) {
     if (ev.tipo === 'inicio') { letreiro.hidden = false; letreiro.textContent = ev.clip.nome; letreiro.style.fontSize = '1.2rem'; }
     if (ev.tipo === 'ocioso') {
       letreiro.hidden = true;
-      if (animacao && $('#loop').checked && tocando) setTimeout(() => tocando && lia.tocar(animacaoParaClipe(animacao)), 500);
+      if (animacao && $('#loop').checked && tocando) setTimeout(() => tocando && tete.tocar(animacaoParaClipe(animacao)), 500);
     }
   },
 });
@@ -175,8 +175,8 @@ $('#btnProcessar').addEventListener('click', async () => {
 function tocar() {
   if (!animacao) return;
   tocando = true;
-  lia.parar();
-  lia.tocar(animacaoParaClipe(animacao));
+  tete.parar();
+  tete.tocar(animacaoParaClipe(animacao));
   video.currentTime = 0; video.play().catch(() => {});
 }
 $('#btnTocar').addEventListener('click', tocar);
@@ -186,8 +186,8 @@ $('#loop').addEventListener('change', (e) => { if (!e.target.checked) tocando = 
 $('#btnSalvar').addEventListener('click', () => {
   try {
     salvarAnimacaoLocal(animacao);
-    status.textContent = `Sinal ${animacao.glosa} salvo. A Lia já usa este sinal no app.`;
-    lia.gesto('comemorar');
+    status.textContent = `Sinal ${animacao.glosa} salvo. A Teté já usa este sinal no app.`;
+    tete.gesto('comemorar');
     listar();
   } catch {
     status.textContent = 'Sem espaço no armazenamento do navegador. Baixe o .json.';
@@ -214,7 +214,7 @@ function listar() {
     info.querySelector('code').textContent = (a.palavras || []).join(', ');
     const ver = document.createElement('button');
     ver.className = 'btn'; ver.textContent = '▶';
-    ver.addEventListener('click', () => { lia.parar(); lia.tocar(animacaoParaClipe(a)); });
+    ver.addEventListener('click', () => { tete.parar(); tete.tocar(animacaoParaClipe(a)); });
     const del = document.createElement('button');
     del.className = 'btn'; del.textContent = 'Excluir';
     del.addEventListener('click', () => { if (confirm(`Excluir ${a.glosa}?`)) { removerAnimacaoLocal(a.id); listar(); } });
@@ -230,5 +230,5 @@ function listar() {
   await carregarDicionario();
   mesclarLocais();
   listar();
-  lia.gesto('acenar');
+  tete.gesto('acenar');
 })();
