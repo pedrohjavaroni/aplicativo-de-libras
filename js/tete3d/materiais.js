@@ -151,7 +151,7 @@ export function criarMateriais() {
   const dentes = new THREE.MeshPhysicalMaterial({ color: 0xfaf6f0, roughness: 0.3, clearcoat: 0.5, side: THREE.DoubleSide });
   const sobrancelha = new THREE.MeshStandardMaterial({ color: COR.sobrancelha, roughness: 0.9, side: THREE.DoubleSide });
   const cilios = new THREE.MeshStandardMaterial({ color: 0x1b100a, roughness: 0.7 });
-  const unha = new THREE.MeshPhysicalMaterial({ color: 0xf7cdbf, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.1 });
+  const unha = new THREE.MeshPhysicalMaterial({ color: 0xeaa792, roughness: 0.35, clearcoat: 0.35, clearcoatRoughness: 0.3 });
   const costura = new THREE.MeshStandardMaterial({ color: 0xe2b56c, roughness: 0.8 });
   return { pele, rosto, blusa, saia, jeans, cabeloBase, cabelo, ouro, lente, labios, boca, dentes, sobrancelha, cilios, unha, costura };
 }

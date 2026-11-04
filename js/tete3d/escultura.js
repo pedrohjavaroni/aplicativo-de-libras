@@ -159,7 +159,7 @@ function pesosCorrente(x, y, z, corrente, transicao) {
 }
 
 const RAIOS_DEDOS = {
-  Thumb: [0.0128, 0.0119, 0.011, 0.01],
+  Thumb: [0.0116, 0.0108, 0.0098, 0.0088],
   Index: [0.0101, 0.0095, 0.0089, 0.0083],
   Middle: [0.0104, 0.0098, 0.0091, 0.0084],
   Ring: [0.0098, 0.0092, 0.0086, 0.0079],
@@ -252,15 +252,16 @@ export function criarEscultura() {
     const S = pos(ossos[`${lado}UpperArm`]), E = pos(ossos[`${lado}LowerArm`]), W = pos(ossos[`${lado}Hand`]);
     const dir = W.map((c, i) => c - E[i]); const nd = Math.hypot(...dir); dir.forEach((c, i) => { dir[i] = c / nd; });
     const ponto = (base, t) => base.map((c, i) => c + dir[i] * t);
-    const inicioPunho = ponto(W, -0.042), fimPunho = ponto(W, 0.004);
+    const inicioPunho = ponto(W, -0.045), fimPunho = ponto(W, 0.008);
     const balao = E.map((c, i) => c + (inicioPunho[i] - c) * 0.6);
     function sdfManga(x, y, z) {
       let d = smin(esfera(x, y, z, S.map((c, i) => c + [0, 0.004, 0][i]), 0.05), cone(x, y, z, S, E, 0.049, 0.046), 0.02);
       d = smin(d, cone(x, y, z, E, inicioPunho, 0.046, 0.045), 0.03);
       d = smin(d, esfera(x, y, z, balao, 0.049), 0.05); // volume "balão" do antebraço
-      d = smin(d, cone(x, y, z, inicioPunho, fimPunho, 0.029, 0.028), 0.014); // punho de elástico
-      // franzido do elástico e pregas da manga
-      d += 0.0012 * Math.sin((x * 0.6 + z) * 260 + y * 40) * suave(0.0, 0.02, Math.hypot(x - E[0], y - E[1], z - E[2]));
+      d = smin(d, cone(x, y, z, inicioPunho, fimPunho, 0.031, 0.031), 0.014); // punho de elástico (liso, por cima do pulso)
+      // pregas suaves só no corpo da manga (o punho fica liso, sem borda ondulada)
+      const ate = Math.hypot(x - W[0], y - W[1], z - W[2]);
+      d += 0.0012 * Math.sin((x * 0.6 + z) * 260 + y * 40) * suave(0.0, 0.02, Math.hypot(x - E[0], y - E[1], z - E[2])) * suave(0.06, 0.09, ate);
       return d;
     }
     const corrManga = [
@@ -286,17 +287,20 @@ export function criarEscultura() {
       const [lx, ly, lz] = aplicar(inv, x, y, z);
       let d = caixa(lx, ly + 0.047, lz, [0.033, 0.042, 0.0115], 0.0105);
       d = smin(d, elipsoide(lx, ly, lz, [s * 0.019, -0.034, 0.008], [0.017, 0.025, 0.013]), 0.014);
-      d = smin(d, cone(lx, ly, lz, [0, 0.045, 0], [0, -0.012, 0], 0.023, 0.026), 0.015); // punho (entra na manga)
+      d = smin(d, cone(lx, ly, lz, [0, 0.014, 0], [0, -0.012, 0], 0.023, 0.026), 0.015); // pulso (curto: o punho da manga cobre a junção)
       return d;
     }
     function sdfMao(x, y, z) {
-      let d = sdfPalma(x, y, z);
+      // cada dedo se funde só com a palma — nunca com o dedo vizinho
+      // (senão a pele entre eles estica como um fio quando os dedos se separam)
+      const palma = sdfPalma(x, y, z);
+      let d = palma;
       for (const dd of DEDOS) {
         const p = dedos[dd], r = RAIOS_DEDOS[dd];
         let f = cone(x, y, z, p[0], p[1], r[0], r[1]);
-        f = smin(f, cone(x, y, z, p[1], p[2], r[1], r[2]), 0.004);
-        f = smin(f, cone(x, y, z, p[2], p[3], r[2], r[3]), 0.004);
-        d = smin(d, f, dd === 'Thumb' ? 0.012 : 0.008);
+        f = smin(f, cone(x, y, z, p[1], p[2], r[1], r[2]), 0.009); // juntas lisas (sem "gomos")
+        f = smin(f, cone(x, y, z, p[2], p[3], r[2], r[3]), 0.009);
+        d = Math.min(d, smin(palma, f, dd === 'Thumb' ? 0.012 : 0.008));
       }
       return d;
     }
@@ -310,20 +314,32 @@ export function criarEscultura() {
     }
     function pesosMao(x, y, z) {
       const dPalma = sdfPalma(x, y, z);
-      let melhor = null, dm = dPalma + 0.002;
+      // pesos da palma: mão, com transição para o antebraço no punho
+      const ly = aplicar(inv, x, y, z)[1];
+      // acima do pulso a pele segue o antebraço; transição suave só na articulação
+      const wAnte = suave(-0.012, 0.016, ly);
+      const palma = wAnte > 0 ? { [`${lado}Hand`]: 1 - wAnte, [`${lado}LowerArm`]: wAnte } : { [`${lado}Hand`]: 1 };
+      // dedo mais próximo e o segundo mais próximo
+      let d1 = Infinity, d2 = Infinity, p1 = null;
       for (const d of DEDOS) {
         const r = pesosCorrente(x, y, z, correntes[d], 0.008);
-        if (r.dist < dm) { dm = r.dist; melhor = r.pesos; }
+        if (r.dist < d1) { d2 = d1; d1 = r.dist; p1 = r.pesos; } else if (r.dist < d2) d2 = r.dist;
       }
-      if (melhor) return melhor;
-      // palma: mão, com transição para o antebraço no punho
-      const ly = aplicar(inv, x, y, z)[1];
-      const wAnte = 1 - suave(-0.012, 0.012, -ly);
-      return wAnte > 0 ? { [`${lado}Hand`]: 1 - wAnte * 0.5, [`${lado}LowerArm`]: wAnte * 0.5 } : { [`${lado}Hand`]: 1 };
+      // transição gradual palma ↔ dedo, e no vão entre dois dedos o peso vai para a palma
+      // (assim nenhuma aresta liga 100% um osso a 100% outro — nada estica como fio)
+      const perto = 1 - suave(0.006, 0.026, dPalma); // a regra do vão só vale junto da palma
+      const vao = 1 - (1 - suave(0.0, 0.006, d2 - d1)) * perto;
+      const wDedo = suave(-0.005, 0.007, dPalma - d1) * vao;
+      if (wDedo <= 0.001) return palma;
+      const pesos = {};
+      for (const k in palma) pesos[k] = palma[k] * (1 - wDedo);
+      for (const k in p1) pesos[k] = (pesos[k] || 0) + p1[k] * wDedo;
+      return pesos;
     }
     const todos = [W, ...Object.values(dedos).flat()];
-    const minM = [0, 1, 2].map((i) => Math.min(...todos.map((p) => p[i])) - 0.03);
-    const maxM = [0, 1, 2].map((i) => Math.max(...todos.map((p) => p[i])) + 0.03);
+    // margem larga: o punho precisa fechar por inteiro dentro da caixa (sem borda aberta)
+    const minM = [0, 1, 2].map((i) => Math.min(...todos.map((p) => p[i])) - 0.065);
+    const maxM = [0, 1, 2].map((i) => Math.max(...todos.map((p) => p[i])) + 0.065);
     partes.push({ nome: `mao-${lado}`, material: 'pele', sdf: sdfMao, min: minM, max: maxM, passo: 0.0016, pesos: pesosMao });
   }
 

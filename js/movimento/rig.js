@@ -79,7 +79,7 @@ export function criarEsqueleto() {
 export function aplicarPoseLigacao(ossos) {
   for (const n in ossos) ossos[n].quaternion.identity();
   const rad = THREE.MathUtils.degToRad;
-  const abertura = { Index: 7, Middle: 0, Ring: -7, Little: -15 };
+  const abertura = { Index: 10, Middle: 0, Ring: -11, Little: -23 };
   for (const [lado, s] of [['left', 1], ['right', -1]]) {
     ossos[`${lado}UpperArm`].quaternion.setFromEuler(new THREE.Euler(0, 0, s * rad(14)));
     ossos[`${lado}LowerArm`].quaternion.setFromEuler(new THREE.Euler(rad(-6), 0, 0));

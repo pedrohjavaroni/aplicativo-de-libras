@@ -55,6 +55,10 @@ export function criarTete(container, { aoMarcar, base, oculos = false } = {}) {
   const motor = criarMotor({ aoMarcar });
   const { ossos } = motor;
   cena.add(ossos.hips.parent);
+  // mãos um pouco maiores, como nos intérpretes de animação: sinais mais legíveis.
+  // É só visual — as animações usam rotações, então as configurações de mão não mudam.
+  ossos.leftHand.scale.setScalar(1.12);
+  ossos.rightHand.scale.setScalar(1.12);
   const mat = criarMateriais();
   let rosto = null;
   // aviso enquanto o modelo baixa (pode levar alguns segundos no 4G)

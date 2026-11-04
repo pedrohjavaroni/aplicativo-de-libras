@@ -9,8 +9,8 @@ export function criarDetalhes(ossos, mat) {
       const r = RAIOS_DEDOS[d][3];
       const comp = COMP_DEDOS[d][2];
       const unha = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 10), mat.unha);
-      unha.scale.set(r * 0.72, comp * 0.4, r * 0.32);
-      unha.position.set(0, -comp * 0.62, -r * 0.82); // costas do dedo (−Z)
+      unha.scale.set(r * 0.62, comp * 0.36, r * 0.22);
+      unha.position.set(0, -comp * 0.66, -r * 0.84); // costas do dedo (−Z), rente à pele
       ossos[`${lado}${d}Distal`].add(unha);
     }
   }
