@@ -4,7 +4,7 @@
 // malhas, quanto pelo app (o rosto usa a superfície da cabeça para assentar
 // lábios e sobrancelhas).
 //
-// Inspirada na modelo de referência: rosto arredondado com bochechas cheias,
+// Inspirada na modelo de referência: rosto oval suave com bochechas discretas,
 // nariz pequeno, olhos grandes, cabelo castanho cacheado muito volumoso,
 // blusa gola alta canelada sem manga e jeans de cintura alta.
 
@@ -30,10 +30,10 @@ export function sdfCabeca(x, y, z) {
 
 function sdfCabecaBase(x, y, z) {
   const px = x, py = y - 0.115, pz = z - 0.01; // relativo ao centro da cabeça
-  let d = elipsoide(px, py, pz, [0, 0.012, -0.012], [0.09, 0.1, 0.098]);
+  let d = elipsoide(px, py, pz, [0, 0.012, -0.012], [0.086, 0.1, 0.096]);
   d = smin(d, elipsoide(px, py, pz, [0, 0.05, 0.035], [0.074, 0.05, 0.062]), 0.03); // testa
-  for (const s of [1, -1]) d = smin(d, esfera(px, py, pz, [s * 0.042, -0.04, 0.043], 0.037), 0.036); // bochechas
-  d = smin(d, elipsoide(px, py, pz, [0, -0.056, 0.025], [0.053, 0.044, 0.055]), 0.035); // mandíbula
+  for (const s of [1, -1]) d = smin(d, esfera(px, py, pz, [s * 0.04, -0.036, 0.036], 0.03), 0.03); // bochechas (suaves)
+  d = smin(d, elipsoide(px, py, pz, [0, -0.056, 0.026], [0.046, 0.044, 0.052]), 0.03); // mandíbula (afinada)
   d = smin(d, esfera(px, py, pz, [0, -0.084, 0.047], 0.016), 0.022); // queixo
   for (const s of [1, -1]) d = smin(d, elipsoide(px, py, pz, [s * 0.036, 0.035, 0.07], [0.024, 0.007, 0.011]), 0.014); // arco das sobrancelhas
   // nariz pequeno e arrebitado
@@ -69,11 +69,11 @@ const BOLHAS = (() => {
     if (nz > 0.45 && ny < 0.55 && Math.abs(nx) < 0.7) continue; // rosto livre
     const desce = ny < 0 ? -ny : 0;
     const c = [
-      H[0] + nx * (0.118 + desce * 0.03),
-      H[1] + ny * (ny > 0 ? 0.125 : 0.24),
-      H[2] + nz * 0.118 - desce * 0.02,
+      H[0] + nx * (0.1 + desce * 0.012),
+      H[1] + ny * (ny > 0 ? 0.11 : 0.16),
+      H[2] + nz * 0.102 - desce * 0.015,
     ];
-    lista.push([c, 0.042 + rnd() * 0.02 - desce * 0.01]);
+    lista.push([c, 0.034 + rnd() * 0.014 - desce * 0.008]);
   }
   return lista;
 })();
@@ -91,6 +91,7 @@ function sdfCabeloBase(x, y, z) {
   // linha do cabelo e rosto livres
   d = ssub(d, elipsoide(x, y, z, [0, 0.092, 0.07], [0.084, 0.105, 0.078]), 0.014);
   d = ssub(d, cone(x, y, z, [0, -0.12, 0.03], [0, 0.03, 0.04], 0.055, 0.05), 0.02); // pescoço
+  d = smax(d, -0.035 - y, 0.025); // termina acima dos ombros
   return d;
 }
 

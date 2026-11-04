@@ -106,7 +106,8 @@ export function criarCachos(base, mat) {
   const usados = [];
   const p = new THREE.Vector3(), n = new THREE.Vector3();
   // região do rosto (espaço da cabeça): nenhum cacho pode passar por ela
-  const evitar = (q) => q.z > 0.045 && Math.abs(q.x) < 0.085 && q.y > 0.03 && q.y < 0.19;
+  // rosto livre e nada abaixo da linha dos ombros (não atravessa o corpo)
+  const evitar = (q) => (q.z > 0.045 && Math.abs(q.x) < 0.085 && q.y > 0.03 && q.y < 0.19) || q.y < -0.06;
   for (let k = 0; k < 60000 && partes.length < 750; k++) {
     const i = Math.floor(rnd() * pos.count);
     p.fromBufferAttribute(pos, i);
@@ -114,9 +115,9 @@ export function criarCachos(base, mat) {
     if (n.y < -0.55) continue; // parte de baixo do volume (escondida)
     if (usados.some((u) => u.distanceToSquared(p) < 0.00015)) continue; // espaçamento ~1,2 cm
     const raiz = p.clone().addScaledVector(n, -0.008);
-    const baixo = Math.max(0, 0.2 - p.y) * 2.5; // perto dos ombros: cachos mais longos
+    const baixo = Math.max(0, 0.15 - p.y) * 1.5; // na parte de baixo: cachos um pouco mais longos
     const c = cacho(raiz, n.clone(), rnd, {
-      comprimento: 0.035 + rnd() * 0.03 + baixo * 0.05,
+      comprimento: 0.03 + rnd() * 0.022 + baixo * 0.03,
       raioMola: 0.006 + rnd() * 0.0035,
       espessura: 0.0046 + rnd() * 0.0016,
       passoVolta: 0.012 + rnd() * 0.004,

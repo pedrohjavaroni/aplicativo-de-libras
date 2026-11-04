@@ -308,8 +308,8 @@
   {
    "nome": "cabeca",
    "material": "rosto",
-   "vertices": 52156,
-   "triangulos": 104212,
+   "vertices": 49368,
+   "triangulos": 98732,
    "quantMin": [
     -0.13,
     -0.005,
@@ -322,15 +322,15 @@
    ],
    "posicao": {
     "offset": 3509168,
-    "tamanho": 312936
+    "tamanho": 296208
    },
    "normal": {
-    "offset": 3822104,
-    "tamanho": 156468
+    "offset": 3805376,
+    "tamanho": 148104
    },
    "indice": {
-    "offset": 3978572,
-    "tamanho": 625272,
+    "offset": 3953480,
+    "tamanho": 592392,
     "bits": 16
    },
    "rigido": "head"
@@ -338,8 +338,8 @@
   {
    "nome": "cabelo",
    "material": "cabeloBase",
-   "vertices": 25297,
-   "triangulos": 50592,
+   "vertices": 15804,
+   "triangulos": 31604,
    "quantMin": [
     -0.25,
     -0.2,
@@ -351,16 +351,16 @@
     0.000006485084306095979
    ],
    "posicao": {
-    "offset": 4603844,
-    "tamanho": 151782
+    "offset": 4545872,
+    "tamanho": 94824
    },
    "normal": {
-    "offset": 4755628,
-    "tamanho": 75891
+    "offset": 4640696,
+    "tamanho": 47412
    },
    "indice": {
-    "offset": 4831520,
-    "tamanho": 303552,
+    "offset": 4688108,
+    "tamanho": 189624,
     "bits": 16
    },
    "rigido": "head"
