@@ -14,7 +14,7 @@ import { criarRosto } from './rosto.js';
 import { criarCachos } from './cachos.js';
 import { criarDetalhes } from './detalhes.js';
 
-export function criarTete(container, { aoMarcar, base } = {}) {
+export function criarTete(container, { aoMarcar, base, oculos = false } = {}) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
   // celulares (tela de toque): resolução e sombras um pouco menores para manter a fluidez
   const movel = window.matchMedia?.('(pointer: coarse)').matches;
@@ -64,7 +64,7 @@ export function criarTete(container, { aoMarcar, base } = {}) {
   aviso.textContent = 'Carregando a Teté…';
   container.appendChild(aviso);
   const pronto = carregarMalhas(ossos, mat, base).then((malhas) => {
-    rosto = criarRosto(ossos.head, mat);
+    rosto = criarRosto(ossos.head, mat, { oculos });
     ossos.head.add(criarCachos(malhas.cabelo, mat));
     criarDetalhes(ossos, mat);
     aviso.remove();

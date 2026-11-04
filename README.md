@@ -10,7 +10,7 @@ Funciona no navegador do celular (Android/iPhone) e pode ser instalado como app 
 
 ## A personagem: Teté
 
-A Teté é uma intérprete **3D em estilo de animação**, inspirada na modelo da foto de referência (`assets/modelo/referencia.png`): cabelo castanho cacheado bem volumoso (raiz escura, pontas caramelo), óculos redondos de aro dourado, sardas, blusa gola alta canelada terracota sem manga, jeans de cintura alta e a aliança.
+A Teté é uma intérprete **3D em estilo de animação**, inspirada nas fotos de referência da modelo (`assets/modelo/`): cabelo cacheado até os ombros, com raiz escura e mechas caramelo, repartido ao meio; sardas; blusa pêssego com decote em V, franzida nos ombros, e mangas longas bufantes com punho de elástico; saia preta longa; corrente dourada. A cor da blusa é um tom mais forte que a pele para as mãos se destacarem durante os sinais. Os óculos redondos da primeira foto continuam disponíveis: `criarTete(el, { oculos: true })`.
 
 **Como ela é feita:**
 

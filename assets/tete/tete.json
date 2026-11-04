@@ -49,45 +49,45 @@
   {
    "nome": "blusa",
    "material": "blusa",
-   "vertices": 21948,
-   "triangulos": 43920,
+   "vertices": 28996,
+   "triangulos": 57988,
    "quantMin": [
-    -0.25,
+    -0.23,
     0.98,
     -0.13
    ],
    "quantEscala": [
-    0.000007629510948348211,
-    0.000008850232700083925,
+    0.000007019150072480355,
+    0.00000793469138628214,
     0.000004119935912108034
    ],
    "posicao": {
     "offset": 0,
-    "tamanho": 131688
+    "tamanho": 173976
    },
    "normal": {
-    "offset": 131688,
-    "tamanho": 65844
+    "offset": 173976,
+    "tamanho": 86988
    },
    "indice": {
-    "offset": 197532,
-    "tamanho": 263520,
+    "offset": 260964,
+    "tamanho": 347928,
     "bits": 16
    },
    "ossoIndice": {
-    "offset": 461052,
-    "tamanho": 87792
+    "offset": 608892,
+    "tamanho": 115984
    },
    "ossoPeso": {
-    "offset": 548844,
-    "tamanho": 87792
+    "offset": 724876,
+    "tamanho": 115984
    }
   },
   {
-   "nome": "jeans",
-   "material": "jeans",
-   "vertices": 17654,
-   "triangulos": 35304,
+   "nome": "saia",
+   "material": "saia",
+   "vertices": 17062,
+   "triangulos": 34120,
    "quantMin": [
     -0.18,
     0.5,
@@ -99,106 +99,106 @@
     0.00000396734569314107
    ],
    "posicao": {
-    "offset": 636636,
-    "tamanho": 105924
+    "offset": 840860,
+    "tamanho": 102372
    },
    "normal": {
-    "offset": 742560,
-    "tamanho": 52962
+    "offset": 943232,
+    "tamanho": 51186
    },
    "indice": {
-    "offset": 795524,
-    "tamanho": 211824,
+    "offset": 994420,
+    "tamanho": 204720,
     "bits": 16
    },
    "ossoIndice": {
-    "offset": 1007348,
-    "tamanho": 70616
+    "offset": 1199140,
+    "tamanho": 68248
    },
    "ossoPeso": {
-    "offset": 1077964,
-    "tamanho": 70616
+    "offset": 1267388,
+    "tamanho": 68248
    }
   },
   {
    "nome": "pescoco",
    "material": "pele",
-   "vertices": 8619,
-   "triangulos": 17020,
+   "vertices": 16960,
+   "triangulos": 33874,
    "quantMin": [
-    -0.05,
-    1.39,
-    -0.05
+    -0.2,
+    1.28,
+    -0.11
    ],
    "quantEscala": [
-    0.0000015259021896696423,
-    0.0000035095750362401803,
-    0.0000016784924086366063
+    0.000006103608758678569,
+    0.0000051880674448767845,
+    0.000003509575036240177
    ],
    "posicao": {
-    "offset": 1148580,
-    "tamanho": 51714
+    "offset": 1335636,
+    "tamanho": 101760
    },
    "normal": {
-    "offset": 1200296,
-    "tamanho": 25857
+    "offset": 1437396,
+    "tamanho": 50880
    },
    "indice": {
-    "offset": 1226156,
-    "tamanho": 102120,
+    "offset": 1488276,
+    "tamanho": 203244,
     "bits": 16
    },
    "ossoIndice": {
-    "offset": 1328276,
-    "tamanho": 34476
+    "offset": 1691520,
+    "tamanho": 67840
    },
    "ossoPeso": {
-    "offset": 1362752,
-    "tamanho": 34476
+    "offset": 1759360,
+    "tamanho": 67840
    }
   },
   {
-   "nome": "braco-left",
-   "material": "pele",
-   "vertices": 10532,
-   "triangulos": 21060,
+   "nome": "manga-left",
+   "material": "blusa",
+   "vertices": 15450,
+   "triangulos": 30896,
    "quantMin": [
-    0.125,
-    0.8328972485427195,
-    -0.065
+    0.10999999999999999,
+    0.8325649497831284,
+    -0.08
    ],
    "quantEscala": [
-    0.0000036267880715852813,
-    0.000009492679506481732,
-    0.0000020919169555043226
+    0.000004028755437777826,
+    0.000009726635388981026,
+    0.0000025254435803358123
    ],
    "posicao": {
-    "offset": 1397228,
-    "tamanho": 63192
+    "offset": 1827200,
+    "tamanho": 92700
    },
    "normal": {
-    "offset": 1460420,
-    "tamanho": 31596
+    "offset": 1919900,
+    "tamanho": 46350
    },
    "indice": {
-    "offset": 1492016,
-    "tamanho": 126360,
+    "offset": 1966252,
+    "tamanho": 185376,
     "bits": 16
    },
    "ossoIndice": {
-    "offset": 1618376,
-    "tamanho": 42128
+    "offset": 2151628,
+    "tamanho": 61800
    },
    "ossoPeso": {
-    "offset": 1660504,
-    "tamanho": 42128
+    "offset": 2213428,
+    "tamanho": 61800
    }
   },
   {
    "nome": "mao-left",
    "material": "pele",
-   "vertices": 25898,
-   "triangulos": 51676,
+   "vertices": 25893,
+   "triangulos": 51664,
    "quantMin": [
     0.2591336386181595,
     0.6959735466913641,
@@ -210,69 +210,69 @@
     0.0000017119730993742848
    ],
    "posicao": {
-    "offset": 1702632,
-    "tamanho": 155388
+    "offset": 2275228,
+    "tamanho": 155358
    },
    "normal": {
-    "offset": 1858020,
-    "tamanho": 77694
+    "offset": 2430588,
+    "tamanho": 77679
    },
    "indice": {
-    "offset": 1935716,
-    "tamanho": 310056,
+    "offset": 2508268,
+    "tamanho": 309984,
     "bits": 16
    },
    "ossoIndice": {
-    "offset": 2245772,
-    "tamanho": 103592
+    "offset": 2818252,
+    "tamanho": 103572
    },
    "ossoPeso": {
-    "offset": 2349364,
-    "tamanho": 103592
+    "offset": 2921824,
+    "tamanho": 103572
    }
   },
   {
-   "nome": "braco-right",
-   "material": "pele",
-   "vertices": 10522,
-   "triangulos": 21040,
+   "nome": "manga-right",
+   "material": "blusa",
+   "vertices": 15394,
+   "triangulos": 30784,
    "quantMin": [
-    -0.3626815562713414,
-    0.8328972485427195,
-    -0.065
+    -0.3740244876147698,
+    0.8325649497831284,
+    -0.08
    ],
    "quantEscala": [
-    0.0000036267880715852813,
-    0.000009492679506481732,
-    0.0000020919169555043226
+    0.000004028755437777826,
+    0.000009726635388981026,
+    0.0000025254435803358123
    ],
    "posicao": {
-    "offset": 2452956,
-    "tamanho": 63132
+    "offset": 3025396,
+    "tamanho": 92364
    },
    "normal": {
-    "offset": 2516088,
-    "tamanho": 31566
+    "offset": 3117760,
+    "tamanho": 46182
    },
    "indice": {
-    "offset": 2547656,
-    "tamanho": 126240,
+    "offset": 3163944,
+    "tamanho": 184704,
     "bits": 16
    },
    "ossoIndice": {
-    "offset": 2673896,
-    "tamanho": 42088
+    "offset": 3348648,
+    "tamanho": 61576
    },
    "ossoPeso": {
-    "offset": 2715984,
-    "tamanho": 42088
+    "offset": 3410224,
+    "tamanho": 61576
    }
   },
   {
    "nome": "mao-right",
    "material": "pele",
-   "vertices": 25925,
-   "triangulos": 51728,
+   "vertices": 25921,
+   "triangulos": 51722,
    "quantMin": [
     -0.43525383927780303,
     0.6959735466913641,
@@ -284,25 +284,25 @@
     0.0000017119730993742848
    ],
    "posicao": {
-    "offset": 2758072,
-    "tamanho": 155550
+    "offset": 3471800,
+    "tamanho": 155526
    },
    "normal": {
-    "offset": 2913624,
-    "tamanho": 77775
+    "offset": 3627328,
+    "tamanho": 77763
    },
    "indice": {
-    "offset": 2991400,
-    "tamanho": 310368,
+    "offset": 3705092,
+    "tamanho": 310332,
     "bits": 16
    },
    "ossoIndice": {
-    "offset": 3301768,
-    "tamanho": 103700
+    "offset": 4015424,
+    "tamanho": 103684
    },
    "ossoPeso": {
-    "offset": 3405468,
-    "tamanho": 103700
+    "offset": 4119108,
+    "tamanho": 103684
    }
   },
   {
@@ -321,15 +321,15 @@
     0.000004119935912108034
    ],
    "posicao": {
-    "offset": 3509168,
+    "offset": 4222792,
     "tamanho": 293052
    },
    "normal": {
-    "offset": 3802220,
+    "offset": 4515844,
     "tamanho": 146526
    },
    "indice": {
-    "offset": 3948748,
+    "offset": 4662372,
     "tamanho": 586104,
     "bits": 16
    },
@@ -338,8 +338,8 @@
   {
    "nome": "cabelo",
    "material": "cabeloBase",
-   "vertices": 15804,
-   "triangulos": 31604,
+   "vertices": 18518,
+   "triangulos": 37032,
    "quantMin": [
     -0.25,
     -0.2,
@@ -351,16 +351,16 @@
     0.000006485084306095979
    ],
    "posicao": {
-    "offset": 4534852,
-    "tamanho": 94824
+    "offset": 5248476,
+    "tamanho": 111108
    },
    "normal": {
-    "offset": 4629676,
-    "tamanho": 47412
+    "offset": 5359584,
+    "tamanho": 55554
    },
    "indice": {
-    "offset": 4677088,
-    "tamanho": 189624,
+    "offset": 5415140,
+    "tamanho": 222192,
     "bits": 16
    },
    "rigido": "head"

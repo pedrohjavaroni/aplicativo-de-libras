@@ -61,7 +61,7 @@ const BOLHAS = (() => {
   const rnd = aleatorio(31);
   const lista = [];
   const H = [0, 0.13, -0.012];
-  for (let i = 0; i < 2600 && lista.length < 115; i++) {
+  for (let i = 0; i < 3000 && lista.length < 140; i++) {
     const u = rnd() * 2 - 1, th = rnd() * Math.PI * 2;
     const r = Math.sqrt(1 - u * u);
     const nx = r * Math.cos(th), ny = u, nz = r * Math.sin(th);
@@ -69,8 +69,9 @@ const BOLHAS = (() => {
     if (nz > 0.45 && ny < 0.55 && Math.abs(nx) < 0.7) continue; // rosto livre
     const desce = ny < 0 ? -ny : 0;
     const c = [
-      H[0] + nx * (0.1 + desce * 0.012),
-      H[1] + ny * (ny > 0 ? 0.11 : 0.16),
+      // topo mais baixo e estreito; abre na altura do queixo e cai até os ombros
+      H[0] + nx * (ny > 0 ? 0.094 - ny * 0.012 : 0.1 + desce * 0.035),
+      H[1] + ny * (ny > 0 ? 0.098 : 0.25),
       H[2] + nz * 0.102 - desce * 0.015,
     ];
     lista.push([c, 0.034 + rnd() * 0.014 - desce * 0.008]);
@@ -82,6 +83,12 @@ export function sdfCabelo(x, y, z) {
   return sdfCabeloBase(x / K, y / K, z / K) * K;
 }
 
+/** Altura mínima do cabelo (coordenadas-base da cabeça): acima dos ombros na
+ * frente e nas laterais; atrás das costas ele pode descer mais. */
+export function limiteCabelo(z) {
+  return -0.07 - 0.13 * suave(-0.06, -0.095, z);
+}
+
 function sdfCabeloBase(x, y, z) {
   let d = 1;
   for (const [c, r] of BOLHAS) {
@@ -91,7 +98,9 @@ function sdfCabeloBase(x, y, z) {
   // linha do cabelo e rosto livres
   d = ssub(d, elipsoide(x, y, z, [0, 0.092, 0.07], [0.084, 0.105, 0.078]), 0.014);
   d = ssub(d, cone(x, y, z, [0, -0.12, 0.03], [0, 0.03, 0.04], 0.055, 0.05), 0.02); // pescoço
-  d = smax(d, -0.035 - y, 0.025); // termina acima dos ombros
+  d = ssub(d, elipsoide(x, y, z, [0, -0.045, 0.03], [0.07, 0.05, 0.06]), 0.015); // frente do pescoço e do queixo livres
+  d = smax(d, limiteCabelo(z) - y, 0.025); // até os ombros; atrás, cai sobre as costas
+  d = ssub(d, elipsoide(x, y, z, [0, 0.215, 0.05], [0.0035, 0.025, 0.07]), 0.006); // risca no meio
   return d;
 }
 
@@ -165,21 +174,31 @@ export function criarEscultura() {
   raiz.updateMatrixWorld(true);
   const partes = [];
 
-  // ---------------- blusa ----------------
+  // ---------------- tronco (base comum da blusa e do colo) ----------------
   const ombro = { left: pos(ossos.leftUpperArm), right: pos(ossos.rightUpperArm) };
-  const cotov = { left: pos(ossos.leftLowerArm), right: pos(ossos.rightLowerArm) };
-  const dirBraco = (l) => { const v = cotov[l].map((c, i) => c - ombro[l][i]); const n = Math.hypot(...v); return v.map((c) => c / n); };
-  const mangaFim = (l) => ombro[l].map((c, i) => c + dirBraco(l)[i] * 0.052);
+  // forma do tronco; "folga" afasta a blusa da pele
+  function tronco(x, y, z, folga) {
+    let d = smin(elipsoide(x, y, z, [0, 1.275, 0], [0.134 + folga, 0.132 + folga, 0.09 + folga]),
+      elipsoide(x, y, z, [0, 1.11, 0], [0.113 + folga, 0.12 + folga, 0.082 + folga]), 0.06);
+    d = smin(d, smax(elipsoide(x, y, z, [0, 1.06, 0], [0.114 + folga, 0.2, 0.082 + folga]), y - 1.12, 0.02), 0.03);
+    for (const s of [1, -1]) d = smin(d, elipsoide(x, y, z, [s * 0.05, 1.228, 0.055], [0.05 + folga, 0.046 + folga, 0.042 + folga]), 0.045); // busto suave
+    d = smin(d, cone(x, y, z, [-0.155, 1.405, -0.006], [0.155, 1.405, -0.006], 0.045 + folga, 0.045 + folga), 0.075); // ombros
+    return d;
+  }
+
+  // ---------------- blusa: decote em V, franzida nos ombros, solta na cintura ----------------
+  const yV = 1.335; // fundo do decote
   function sdfBlusa(x, y, z) {
-    let d = smin(elipsoide(x, y, z, [0, 1.275, 0], [0.134, 0.132, 0.09]), elipsoide(x, y, z, [0, 1.11, 0], [0.113, 0.12, 0.082]), 0.06);
-    d = smin(d, smax(elipsoide(x, y, z, [0, 1.06, 0], [0.114, 0.2, 0.082]), y - 1.12, 0.02), 0.03); // cintura reta até dentro do jeans
-    for (const s of [1, -1]) d = smin(d, elipsoide(x, y, z, [s * 0.05, 1.228, 0.055], [0.05, 0.046, 0.042]), 0.045); // busto suave
-    d = smin(d, cone(x, y, z, [-0.16, 1.405, -0.006], [0.16, 1.405, -0.006], 0.047, 0.047), 0.075); // ombros
-    for (const l of ['left', 'right']) d = smin(d, cone(x, y, z, ombro[l].map((c, i) => c + [0, 0.002, 0][i]), mangaFim(l), 0.051, 0.049), 0.025); // cavas
-    d = smin(d, cone(x, y, z, [0, 1.42, -0.004], [0, 1.515, 0.004], 0.058, 0.05), 0.025); // gola alta
-    d = smin(d, toro(x, y, z, [0, 1.512, 0.004], 0.05, 0.0085, 0.95), 0.006); // dobra da gola
-    d = ssub(d, cone(x, y, z, [0, 1.47, 0.004], [0, 1.6, 0.006], 0.036, 0.036), 0.004); // abertura do pescoço
-    d = smax(d, 0.995 - y, 0.008); // barra (por dentro do jeans)
+    let d = tronco(x, y, z, 0.006);
+    d = smin(d, elipsoide(x, y, z, [0, 1.072, 0.004], [0.126, 0.038, 0.092]), 0.03); // blusa "bufante" sobre a saia
+    // franzido abaixo da pala dos ombros (pregas suaves)
+    d += 0.0011 * Math.sin(x * 230) * suave(1.27, 1.37, y) * (1 - suave(1.41, 1.45, y));
+    // decote em V na frente + abertura arredondada do pescoço
+    const k = 2.0, n = Math.hypot(1, k);
+    const dentroV = Math.max(-(y - k * x - yV) / n, -(y + k * x - yV) / n, 0.035 - z);
+    d = smax(d, -dentroV, 0.006);
+    d = ssub(d, cone(x, y, z, [0, 1.425, -0.006], [0, 1.6, 0.0], 0.052, 0.052), 0.006);
+    d = smax(d, 0.995 - y, 0.008); // barra por dentro da saia
     return d;
   }
   const corrTronco = [
@@ -189,56 +208,69 @@ export function criarEscultura() {
     { osso: 'neck', a: [0, 1.45, 0], b: [0, 1.53, 0], r: 0 },
   ];
   function pesosTronco(x, y, z) {
-    // tronco: só pela altura (independe da distância ao eixo)
     const { pesos } = pesosCorrente(0, y, 0, corrTronco, 0.05);
-    // manga e topo do ombro acompanham o braço
+    // topo do ombro acompanha um pouco o braço (a manga é uma malha à parte)
     const lado = x > 0 ? 'left' : 'right';
-    const wBraco = suave(0.125, 0.155, Math.abs(x)) * suave(1.3, 1.37, y);
+    const wBraco = 0.7 * suave(0.13, 0.17, Math.abs(x)) * suave(1.33, 1.39, y);
     if (wBraco > 0) {
-      for (const k in pesos) pesos[k] *= 1 - wBraco;
+      for (const kk in pesos) pesos[kk] *= 1 - wBraco;
       pesos[`${lado}UpperArm`] = wBraco;
     }
     return pesos;
   }
-  partes.push({ nome: 'blusa', material: 'blusa', sdf: sdfBlusa, min: [-0.25, 0.98, -0.13], max: [0.25, 1.56, 0.14], passo: 0.0055, pesos: pesosTronco });
+  partes.push({ nome: 'blusa', material: 'blusa', sdf: sdfBlusa, min: [-0.23, 0.98, -0.13], max: [0.23, 1.5, 0.14], passo: 0.0045, pesos: pesosTronco });
 
-  // ---------------- jeans ----------------
-  function sdfJeans(x, y, z) {
-    let d = smin(elipsoide(x, y, z, [0, 0.92, 0], [0.152, 0.16, 0.104]), elipsoide(x, y, z, [0, 1.02, 0], [0.127, 0.06, 0.087]), 0.05);
-    for (const s of [1, -1]) d = smin(d, cone(x, y, z, [s * 0.072, 0.9, 0], [s * 0.078, 0.5, 0.005], 0.078, 0.062), 0.05); // pernas
-    d = smin(d, toro(x, y, z, [0, 1.03, 0], 0.127, 0.0085, 0.69), 0.004); // cós
-    d = smax(d, y - 1.046, 0.006);
+  // ---------------- saia preta longa de cintura alta ----------------
+  function sdfSaia(x, y, z) {
+    let d = smin(elipsoide(x, y, z, [0, 0.92, 0], [0.15, 0.16, 0.103]), elipsoide(x, y, z, [0, 1.02, 0], [0.126, 0.06, 0.087]), 0.05);
+    d = smin(d, smax(elipsoide(x, y, z, [0, 0.7, 0.0], [0.142, 0.4, 0.1]), y - 0.9, 0.05), 0.05); // reta até os tornozelos
+    d = smin(d, toro(x, y, z, [0, 1.032, 0], 0.126, 0.0095, 0.69), 0.004); // cós de elástico
+    d = smax(d, y - 1.048, 0.006);
     d = smax(d, 0.52 - y, 0.004);
     return d;
   }
-  partes.push({ nome: 'jeans', material: 'jeans', sdf: sdfJeans, min: [-0.18, 0.5, -0.13], max: [0.18, 1.06, 0.13], passo: 0.006, pesos: () => ({ hips: 1 }) });
+  partes.push({ nome: 'saia', material: 'saia', sdf: sdfSaia, min: [-0.18, 0.5, -0.13], max: [0.18, 1.06, 0.13], passo: 0.006, pesos: () => ({ hips: 1 }) });
 
-  // ---------------- pescoço ----------------
+  // ---------------- pescoço e colo (pele que aparece no decote) ----------------
   const baseCabeca = pos(ossos.head);
-  const sdfPescoco = (x, y, z) => cone(x, y, z, [0, 1.41, -0.004], [0, baseCabeca[1] + 0.06, 0.008], 0.041, 0.038);
+  const sdfPescoco = (x, y, z) => {
+    let d = cone(x, y, z, [0, 1.40, -0.004], [0, baseCabeca[1] + 0.06, 0.008], 0.041, 0.038);
+    d = smin(d, smax(smax(tronco(x, y, z, 0), 1.29 - y, 0.02), Math.abs(x) - 0.085, 0.02), 0.03); // colo (só onde o decote mostra)
+    for (const s of [1, -1]) d = smin(d, cone(x, y, z, [s * 0.012, 1.428, 0.045], [s * 0.07, 1.438, 0.03], 0.004, 0.003), 0.008); // clavículas suaves
+    return d;
+  };
   const corrPescoco = [
-    { osso: 'chest', a: [0, 1.3, 0], b: [0, 1.45, 0], r: 0 },
+    { osso: 'chest', a: [0, 1.25, 0], b: [0, 1.45, 0], r: 0 },
     { osso: 'neck', a: [0, 1.45, 0], b: [0, 1.53, 0], r: 0 },
     { osso: 'head', a: [0, 1.53, 0], b: [0, 1.7, 0], r: 0 },
   ];
-  partes.push({ nome: 'pescoco', material: 'pele', sdf: sdfPescoco, min: [-0.05, 1.39, -0.05], max: [0.05, 1.62, 0.06], passo: 0.003, pesos: (x, y) => pesosCorrente(0, y, 0, corrPescoco, 0.035).pesos });
+  partes.push({ nome: 'pescoco', material: 'pele', sdf: sdfPescoco, min: [-0.2, 1.28, -0.11], max: [0.2, 1.62, 0.12], passo: 0.0035, pesos: (x, y) => pesosCorrente(0, y, 0, corrPescoco, 0.035).pesos });
 
-  // ---------------- braços e mãos ----------------
+  // ---------------- mangas longas bufantes e mãos ----------------
   for (const lado of ['left', 'right']) {
     const s = lado === 'left' ? 1 : -1;
     const S = pos(ossos[`${lado}UpperArm`]), E = pos(ossos[`${lado}LowerArm`]), W = pos(ossos[`${lado}Hand`]);
-    const alemPunho = W.map((c, i) => c + (W[i] - E[i]) * 0.08);
-    const sdfBraco = (x, y, z) => smin(smin(esfera(x, y, z, S, 0.04), cone(x, y, z, S, E, 0.041, 0.0335), 0.02),
-      cone(x, y, z, E, alemPunho, 0.034, 0.024), 0.025);
-    const corrBraco = [
+    const dir = W.map((c, i) => c - E[i]); const nd = Math.hypot(...dir); dir.forEach((c, i) => { dir[i] = c / nd; });
+    const ponto = (base, t) => base.map((c, i) => c + dir[i] * t);
+    const inicioPunho = ponto(W, -0.042), fimPunho = ponto(W, 0.004);
+    const balao = E.map((c, i) => c + (inicioPunho[i] - c) * 0.6);
+    function sdfManga(x, y, z) {
+      let d = smin(esfera(x, y, z, S.map((c, i) => c + [0, 0.004, 0][i]), 0.05), cone(x, y, z, S, E, 0.049, 0.046), 0.02);
+      d = smin(d, cone(x, y, z, E, inicioPunho, 0.046, 0.045), 0.03);
+      d = smin(d, esfera(x, y, z, balao, 0.049), 0.05); // volume "balão" do antebraço
+      d = smin(d, cone(x, y, z, inicioPunho, fimPunho, 0.029, 0.028), 0.014); // punho de elástico
+      // franzido do elástico e pregas da manga
+      d += 0.0012 * Math.sin((x * 0.6 + z) * 260 + y * 40) * suave(0.0, 0.02, Math.hypot(x - E[0], y - E[1], z - E[2]));
+      return d;
+    }
+    const corrManga = [
       { osso: `${lado}UpperArm`, a: S, b: E, r: 0 },
-      { osso: `${lado}LowerArm`, a: E, b: W, r: 0 },
-      { osso: `${lado}Hand`, a: W, b: alemPunho, r: 0 },
+      { osso: `${lado}LowerArm`, a: E, b: ponto(W, 0.02), r: 0 },
     ];
-    const lim = [S, E, W, alemPunho];
-    const min = [0, 1, 2].map((i) => Math.min(...lim.map((p) => p[i])) - 0.055);
-    const max = [0, 1, 2].map((i) => Math.max(...lim.map((p) => p[i])) + 0.055);
-    partes.push({ nome: `braco-${lado}`, material: 'pele', sdf: sdfBraco, min, max, passo: 0.0042, pesos: (x, y, z) => pesosCorrente(x, y, z, corrBraco, 0.045).pesos });
+    const lim = [S, E, W, fimPunho];
+    const min = [0, 1, 2].map((i) => Math.min(...lim.map((p) => p[i])) - 0.07);
+    const max = [0, 1, 2].map((i) => Math.max(...lim.map((p) => p[i])) + 0.07);
+    partes.push({ nome: `manga-${lado}`, material: 'blusa', sdf: sdfManga, min, max, passo: 0.0042, pesos: (x, y, z) => pesosCorrente(x, y, z, corrManga, 0.05).pesos });
 
     // mão: palma (caixa no espaço da mão), eminência do polegar e dedos
     const mao = ossos[`${lado}Hand`];
@@ -254,7 +286,7 @@ export function criarEscultura() {
       const [lx, ly, lz] = aplicar(inv, x, y, z);
       let d = caixa(lx, ly + 0.047, lz, [0.033, 0.042, 0.0115], 0.0105);
       d = smin(d, elipsoide(lx, ly, lz, [s * 0.019, -0.034, 0.008], [0.017, 0.025, 0.013]), 0.014);
-      d = smin(d, cone(lx, ly, lz, [0, 0.03, 0], [0, -0.012, 0], 0.024, 0.026), 0.015); // punho
+      d = smin(d, cone(lx, ly, lz, [0, 0.045, 0], [0, -0.012, 0], 0.023, 0.026), 0.015); // punho (entra na manga)
       return d;
     }
     function sdfMao(x, y, z) {

@@ -1,4 +1,4 @@
-// Pequenos detalhes presos aos ossos: unhas, aliança e botão do jeans.
+// Pequenos detalhes presos aos ossos: unhas, aliança e colar.
 import * as THREE from '../vendor/three.module.min.js';
 import { DEDOS, COMP_DEDOS } from '../movimento/rig.js';
 import { RAIOS_DEDOS } from './escultura.js';
@@ -19,9 +19,24 @@ export function criarDetalhes(ossos, mat) {
   anel.rotation.x = Math.PI / 2;
   anel.position.y = -0.016;
   ossos.leftRingProximal.add(anel);
-  // botão do jeans
-  const botao = new THREE.Mesh(new THREE.CylinderGeometry(0.0075, 0.0075, 0.004, 24), mat.ouro);
-  botao.rotation.x = Math.PI / 2;
-  botao.position.set(0, 1.031 - 0.95, 0.098);
-  ossos.hips.add(botao);
+  criarColar(ossos, mat);
+}
+
+/** Corrente dourada fina no colo (como nas fotos), presa ao peito. */
+export function criarColar(ossos, mat) {
+  const peito = ossos.chest;
+  peito.updateWorldMatrix(true, false);
+  const pts = [];
+  for (let i = 0; i <= 40; i++) {
+    const t = (i / 40) * Math.PI * 2;
+    const frente = (Math.cos(t) + 1) / 2; // 1 na frente, 0 atrás
+    // contorna a base do pescoço e desce em "U" no colo
+    pts.push(new THREE.Vector3(Math.sin(t) * (0.047 + frente * 0.012), 1.452 - frente * frente * 0.058, Math.cos(t) * 0.044 + 0.004 + frente * 0.028));
+  }
+  const curva = new THREE.CatmullRomCurve3(pts, true);
+  const g = new THREE.TubeGeometry(curva, 160, 0.0011, 6, true);
+  g.applyMatrix4(peito.matrixWorld.clone().invert());
+  const colar = new THREE.Mesh(g, mat.ouro);
+  peito.add(colar);
+  return colar;
 }

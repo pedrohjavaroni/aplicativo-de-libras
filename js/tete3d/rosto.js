@@ -226,7 +226,7 @@ function criarOculos(mat, zEm) {
 
 // ------------------------------------------------------------------ montar -
 
-export function criarRosto(cabeca, mat) {
+export function criarRosto(cabeca, mat, { oculos = false } = {}) {
   const zEm = superficie();
   const grupo = new THREE.Group();
   grupo.scale.setScalar(K);
@@ -239,7 +239,7 @@ export function criarRosto(cabeca, mat) {
   grupo.add(sobrancelhas);
   const boca = criarBoca(mat, zEm);
   grupo.add(boca.grupo);
-  grupo.add(criarOculos(mat, zEm));
+  if (oculos) grupo.add(criarOculos(mat, zEm)); // as fotos novas da modelo são sem óculos
   grupo.traverse((o) => { if (o.isMesh) { o.castShadow = false; o.receiveShadow = true; } });
 
   return {

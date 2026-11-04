@@ -4,8 +4,9 @@ import { aleatorio } from './sdf.js';
 import { CABECA } from './escultura.js';
 
 export const COR = {
-  pele: 0xf0bc9e,
-  blusa: 0xb06856,
+  pele: 0xedb995,
+  blusa: 0xb8664a, // pêssego/terracota das fotos, um tom mais forte que a pele (mãos legíveis)
+  saia: 0x1d1c20,
   jeans: 0xa8c6e4,
   ouro: 0xd6ad62,
   cabelo: 0x3b2316,
@@ -122,9 +123,11 @@ export function criarMateriais() {
     }
   }, { repetir: true, srgb: false });
   const blusa = projetar(new THREE.MeshPhysicalMaterial({
-    color: COR.blusa, roughness: 0.9, sheen: 0.8, sheenRoughness: 0.6, sheenColor: new THREE.Color(0xe9a08b),
-    bumpMap: canelado, bumpScale: 0.35,
-  }), 'cilindro', new THREE.Vector2(36, 1));
+    color: COR.blusa, roughness: 0.85, sheen: 0.9, sheenRoughness: 0.5, sheenColor: new THREE.Color(0xf2b49a),
+    bumpMap: canelado, bumpScale: 0.12,
+  }), 'cilindro', new THREE.Vector2(60, 1));
+  // saia preta de malha, com brilho suave para mostrar o volume
+  const saia = new THREE.MeshPhysicalMaterial({ color: COR.saia, roughness: 0.78, sheen: 0.5, sheenRoughness: 0.5, sheenColor: new THREE.Color(0x6a6a78) });
 
   const sarja = textura(256, (g, t) => {
     g.fillStyle = '#a8c6e4'; g.fillRect(0, 0, t, t);
@@ -150,7 +153,7 @@ export function criarMateriais() {
   const cilios = new THREE.MeshStandardMaterial({ color: 0x1b100a, roughness: 0.7 });
   const unha = new THREE.MeshPhysicalMaterial({ color: 0xf7cdbf, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.1 });
   const costura = new THREE.MeshStandardMaterial({ color: 0xe2b56c, roughness: 0.8 });
-  return { pele, rosto, blusa, jeans, cabeloBase, cabelo, ouro, lente, labios, boca, dentes, sobrancelha, cilios, unha, costura };
+  return { pele, rosto, blusa, saia, jeans, cabeloBase, cabelo, ouro, lente, labios, boca, dentes, sobrancelha, cilios, unha, costura };
 }
 
 /** Ambiente de estúdio (reflexos suaves nos óculos, olhos e pele). */

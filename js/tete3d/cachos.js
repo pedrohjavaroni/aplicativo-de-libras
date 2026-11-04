@@ -4,8 +4,10 @@
 
 import * as THREE from '../vendor/three.module.min.js';
 import { aleatorio } from './sdf.js';
+import { CABECA, limiteCabelo } from './escultura.js';
 
-const RAIZ = new THREE.Color(0x1d100a), MEIO = new THREE.Color(0x2e1b10), PONTA = new THREE.Color(0x5a3620);
+// mechas iluminadas (balayage) como nas fotos: raiz escura, comprimento castanho, pontas mel
+const RAIZ = new THREE.Color(0x1f110a), MEIO = new THREE.Color(0x3b2214), PONTA = new THREE.Color(0x8f6038);
 
 /** Tubo de raio variável com cor por vértice (referencial por transporte paralelo). */
 function tubo(pontos, raio, cor, lados = 7) {
@@ -90,7 +92,14 @@ function cacho(raiz, normal, rnd, { comprimento, raioMola, espessura, passoVolta
     pts.push(c);
   }
   const tom = rnd();
-  if (evitar && pts.some(evitar)) return null;
+  if (evitar) {
+    // corta o cacho onde ele entraria numa região proibida (rosto, pescoço, corpo)
+    const i = pts.findIndex(evitar);
+    if (i >= 0) {
+      if (i < pts.length * 0.4) return null;
+      pts.length = i;
+    }
+  }
   return tubo(pts, (t) => espessura * (1 - 0.6 * t * t) * Math.min(1, 0.6 + t * 4), (t, cor) => {
     if (t < 0.3) cor.copy(RAIZ).lerp(MEIO, t / 0.3);
     else cor.copy(MEIO).lerp(PONTA, ((t - 0.3) / 0.7) * (0.45 + 0.55 * tom));
@@ -107,20 +116,22 @@ export function criarCachos(base, mat) {
   const p = new THREE.Vector3(), n = new THREE.Vector3();
   // região do rosto (espaço da cabeça): nenhum cacho pode passar por ela
   // rosto livre e nada abaixo da linha dos ombros (não atravessa o corpo)
-  const evitar = (q) => (q.z > 0.045 && Math.abs(q.x) < 0.085 && q.y > 0.03 && q.y < 0.19) || q.y < -0.06;
-  for (let k = 0; k < 60000 && partes.length < 750; k++) {
+  const K = CABECA.escala;
+  const evitar = (q) => (q.z > 0.045 && Math.abs(q.x) < 0.085 && q.y > 0.03 && q.y < 0.19) || q.y < limiteCabelo(q.z / K) * K + 0.012
+    || (q.z > 0.0 && Math.abs(q.x) < 0.058 && q.y < 0.02); // frente do pescoço livre
+  for (let k = 0; k < 60000 && partes.length < 520; k++) {
     const i = Math.floor(rnd() * pos.count);
     p.fromBufferAttribute(pos, i);
     n.fromBufferAttribute(nor, i).normalize();
     if (n.y < -0.55) continue; // parte de baixo do volume (escondida)
-    if (usados.some((u) => u.distanceToSquared(p) < 0.00015)) continue; // espaçamento ~1,2 cm
+    if (usados.some((u) => u.distanceToSquared(p) < 0.0002)) continue; // espaçamento ~1,4 cm
     const raiz = p.clone().addScaledVector(n, -0.008);
     const baixo = Math.max(0, 0.15 - p.y) * 1.5; // na parte de baixo: cachos um pouco mais longos
     const c = cacho(raiz, n.clone(), rnd, {
-      comprimento: 0.03 + rnd() * 0.022 + baixo * 0.03,
-      raioMola: 0.006 + rnd() * 0.0035,
-      espessura: 0.0046 + rnd() * 0.0016,
-      passoVolta: 0.012 + rnd() * 0.004,
+      comprimento: 0.045 + rnd() * 0.03 + baixo * 0.05,
+      raioMola: 0.009 + rnd() * 0.004, // cachos largos e soltos, como nas fotos
+      espessura: 0.0055 + rnd() * 0.0018,
+      passoVolta: 0.02 + rnd() * 0.006,
       evitar,
     });
     if (!c) continue;
