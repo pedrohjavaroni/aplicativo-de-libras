@@ -1,0 +1,193 @@
+:root {
+  --bg: #fbf6f2;
+  --surface: #ffffff;
+  --surface-2: #f4ebe5;
+  --text: #2a1d17;
+  --muted: #6e5e56;
+  --primary: #b8786a;      /* terracota da blusa da Lia */
+  --primary-strong: #96584b;
+  --accent: #5b8fc2;       /* azul jeans */
+  --ok: #3c8a5d;
+  --danger: #c0453b;
+  --border: #e7d9d0;
+  --shadow: 0 6px 24px rgba(80, 40, 20, 0.08);
+  --radius: 18px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1512; --surface: #261d19; --surface-2: #31261f; --text: #f6ece6;
+    --muted: #bba79c; --primary: #d48f80; --primary-strong: #e8a596; --accent: #86b4e0;
+    --border: #3d3029; --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  }
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body {
+  font-family: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; cursor: pointer; }
+
+header.topo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 5;
+}
+header.topo h1 { font-size: 1.15rem; margin: 0; }
+header.topo .logo {
+  width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+  background: var(--primary); color: #fff; font-weight: 800;
+}
+
+main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 16px 16px 96px; }
+
+.tela { display: none; flex-direction: column; gap: 14px; }
+.tela.ativa { display: flex; }
+
+/* ---------- palco da Lia (avatar 3D) ---------- */
+.palco {
+  position: relative;
+  background: radial-gradient(120% 90% at 50% 20%, var(--surface), var(--surface-2));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  height: min(58vh, 460px);
+  min-height: 260px;
+  transition: height .35s ease;
+}
+.avatar3d { position: absolute; inset: 0; }
+.avatar3d canvas { width: 100%; height: 100%; display: block; cursor: pointer; }
+main[data-tela="libras"] .palco, main[data-tela="treinar"] .palco { height: 200px; min-height: 200px; }
+/* na tradução voz→Libras a Lia fica fixa no topo enquanto a pessoa rola a tela */
+main[data-tela="voz"] .palco { position: sticky; top: 62px; z-index: 4; height: min(46vh, 420px); }
+
+.balao {
+  position: absolute; top: 12px; left: 12px; right: 12px; z-index: 2;
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: 14px;
+  padding: 10px 14px; box-shadow: var(--shadow);
+  font-size: 1rem; line-height: 1.4;
+  transition: opacity .25s, transform .25s;
+}
+.balao.oculto { opacity: 0; transform: translateY(-6px); pointer-events: none; }
+main[data-tela="libras"] .balao, main[data-tela="treinar"] .balao { left: auto; max-width: 38%; font-size: .8rem; padding: 8px 10px; }
+
+.letreiro {
+  position: absolute; left: 14px; bottom: 14px; z-index: 2;
+  min-width: 72px; padding: 6px 14px; text-align: center;
+  background: var(--primary); color: #fff; border-radius: 14px;
+  font-size: 2.2rem; font-weight: 800; letter-spacing: .04em;
+  box-shadow: var(--shadow);
+}
+.letreiro small { display: block; font-size: .7rem; font-weight: 700; letter-spacing: .02em; opacity: .92; }
+.letreiro[hidden] { display: none; }
+
+.controles-palco { position: absolute; right: 10px; bottom: 10px; z-index: 2; display: flex; gap: 6px; }
+.btn.mini { min-height: 36px; min-width: 40px; padding: 6px 10px; font-size: .85rem; background: var(--surface); border: 1px solid var(--border); }
+
+/* ---------- cartões e controles ---------- */
+.cartao {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow);
+}
+.cartao h2 { font-size: 1rem; margin: 0 0 8px; }
+.muted { color: var(--muted); font-size: .92rem; }
+
+.botoes { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn {
+  border: 0; border-radius: 14px; padding: 12px 16px; min-height: 48px;
+  background: var(--surface-2); color: var(--text); font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn.primario { background: var(--primary); color: #fff; }
+.btn.primario:hover { background: var(--primary-strong); }
+.btn.grande { flex: 1; min-height: 64px; font-size: 1.1rem; }
+.btn.gravando { background: var(--danger); color: #fff; animation: pulso 1.2s infinite; }
+@keyframes pulso { 50% { box-shadow: 0 0 0 8px rgba(192, 69, 59, .18); } }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+textarea, input[type="text"], select {
+  width: 100%; font: inherit; color: var(--text); background: var(--bg);
+  border: 1px solid var(--border); border-radius: 12px; padding: 12px;
+}
+textarea { min-height: 70px; resize: vertical; }
+
+.transcricao { font-size: 1.3rem; line-height: 1.45; min-height: 1.5em; }
+.transcricao .interim { color: var(--muted); }
+
+.glosas { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.glosa {
+  padding: 4px 10px; border-radius: 999px; font-weight: 800; font-size: .85rem;
+  background: var(--surface-2); border: 1px solid var(--border);
+}
+.glosa.datilologia { border-style: dashed; }
+.glosa.atual { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.frases { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.frases .btn { width: 100%; text-align: left; justify-content: flex-start; min-height: 56px; }
+
+.camera-box { display: none; position: relative; border-radius: var(--radius); overflow: hidden; background: #000; aspect-ratio: 4 / 3; }
+.camera-box video, .camera-box canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+.camera-box .status {
+  position: absolute; left: 10px; top: 10px; z-index: 2; color: #fff; font-size: .85rem;
+  background: rgba(0, 0, 0, .55); padding: 4px 10px; border-radius: 999px;
+}
+.camera-box .placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: #ddd; text-align: center; padding: 20px; }
+
+.reconhecido { font-size: 1.6rem; font-weight: 800; min-height: 2rem; }
+.frase-montada { font-size: 1.25rem; min-height: 1.6em; }
+
+.lista-sinais { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.lista-sinais li {
+  display: flex; align-items: center; gap: 8px; justify-content: space-between;
+  padding: 8px 10px; background: var(--surface-2); border-radius: 12px;
+}
+.lista-sinais .btn { min-height: 36px; padding: 6px 10px; }
+
+/* ---------- navegação inferior ---------- */
+nav.abas {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  background: var(--surface); border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+nav.abas button {
+  border: 0; background: none; color: var(--muted); padding: 8px 4px 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: .75rem; font-weight: 700;
+}
+nav.abas button svg { width: 24px; height: 24px; }
+nav.abas button[aria-selected="true"] { color: var(--primary); }
+
+.aviso { padding: 10px 12px; border-radius: 12px; background: #fff4d6; color: #5c4400; font-size: .9rem; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .aviso { background: #3d3216; color: #f3e2b0; } }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+main[data-tela="libras"] .camera-box, main[data-tela="treinar"] .camera-box { display: block; }
+.contagem {
+  position: absolute; inset: 0; z-index: 3; display: grid; place-items: center;
+  font-size: 5rem; font-weight: 800; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,.5);
+  background: rgba(184, 120, 106, .25);
+}
+.contagem[hidden] { display: none; }
+.glosa.capturado, .glosa.procedural { border-color: var(--ok); }
+.glosa.pendente { border-style: dashed; border-color: var(--primary); }
+.legenda { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; font-size: .75rem; }
+.legenda .glosa { font-size: .72rem; font-weight: 700; }
+.check { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+a.btn { text-decoration: none; }
+
+.tete-carregando {
+  position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 16px;
+  color: var(--muted); font-weight: 700; z-index: 1;
+}

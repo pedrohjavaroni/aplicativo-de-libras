@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ponte Libras</title>
+  <meta name="description" content="Tradução Libras ↔ voz com a intérprete 3D Teté, para pessoas surdas e ouvintes conversarem.">
+  <meta name="theme-color" content="#b8786a">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icone-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/icone-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="logo" aria-hidden="true">🤟</div>
+    <h1>Ponte Libras</h1>
+  </header>
+
+  <main id="principal" data-tela="inicio">
+    <!-- Palco da Teté (avatar 3D), compartilhado entre as telas -->
+    <section class="palco" id="palco">
+      <div class="balao" id="balao" aria-live="polite">Oi! Eu sou a Teté 👋</div>
+      <div class="avatar3d" id="avatar"></div>
+      <div class="letreiro" id="letreiro" hidden></div>
+      <div class="controles-palco">
+        <button class="btn mini" id="btnVelocidade" title="Velocidade dos sinais">1×</button>
+        <button class="btn mini" id="btnPararAvatar" title="Parar">■</button>
+      </div>
+    </section>
+
+    <!-- Câmera, compartilhada entre "Libras → Voz" e "Treinar" -->
+    <section class="camera-box" id="cameraBox">
+      <video id="camVideo" playsinline muted></video>
+      <canvas id="camCanvas"></canvas>
+      <div class="placeholder" id="camPlaceholder">Toque em “Ligar câmera” e sinalize de frente para o celular, com as mãos e os ombros visíveis.</div>
+      <span class="status" id="camStatus">câmera desligada</span>
+      <div class="contagem" id="contagem" hidden></div>
+    </section>
+
+    <!-- INÍCIO -->
+    <section class="tela" id="tela-inicio" role="tabpanel">
+      <div class="cartao">
+        <h2>Como posso ajudar?</h2>
+        <p class="muted">Eu traduzo a <b>voz</b> de quem fala para <b>Libras</b>, e os seus <b>sinais</b> para <b>voz</b>.</p>
+        <div class="botoes">
+          <button class="btn primario grande" data-ir="voz">🎤 Ouvir alguém</button>
+          <button class="btn primario grande" data-ir="libras">🤟 Sinalizar</button>
+        </div>
+      </div>
+      <div class="cartao">
+        <h2>Frases rápidas</h2>
+        <p class="muted">Toque para eu falar em voz alta para a pessoa ouvinte.</p>
+        <div class="frases" id="frasesRapidas"></div>
+      </div>
+    </section>
+
+    <!-- VOZ → LIBRAS -->
+    <section class="tela" id="tela-voz" role="tabpanel">
+      <div class="botoes">
+        <button class="btn primario grande" id="btnOuvir">🎤 Começar a ouvir</button>
+      </div>
+      <div id="avisoFala" class="aviso" hidden>
+        Este navegador não reconhece voz. Use o Chrome (Android) ou o Safari (iPhone), ou digite abaixo.
+      </div>
+      <div class="cartao">
+        <h2>O que foi dito</h2>
+        <div class="transcricao" id="transcricao"><span class="muted">—</span></div>
+        <div class="glosas" id="glosas" aria-label="Sinais em Libras"></div>
+        <p class="legenda muted">
+          <span class="glosa capturado">sinal</span>
+          <span class="glosa pendente">sinal a capturar (soletrado)</span>
+          <span class="glosa datilologia">soletrado</span>
+        </p>
+      </div>
+      <div class="cartao">
+        <h2>Ou digite</h2>
+        <textarea id="textoDigitado" placeholder="Ex.: Bom dia, tudo bem? Onde fica o banheiro?"></textarea>
+        <div class="botoes" style="margin-top:10px">
+          <button class="btn primario" id="btnTraduzirTexto">Traduzir para Libras</button>
+          <button class="btn" id="btnRepetir">↻ Repetir</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIBRAS → VOZ -->
+    <section class="tela" id="tela-libras" role="tabpanel">
+      <div class="botoes">
+        <button class="btn primario grande" data-acao="camera">📷 Ligar câmera</button>
+      </div>
+      <div class="cartao">
+        <h2>Sinal reconhecido</h2>
+        <div class="reconhecido" id="reconhecido">—</div>
+        <h2 style="margin-top:12px">Frase</h2>
+        <div class="frase-montada" id="fraseMontada"><span class="muted">Os sinais aparecem aqui…</span></div>
+        <div class="botoes" style="margin-top:10px">
+          <button class="btn primario" id="btnFalarFrase">🔊 Falar</button>
+          <button class="btn" id="btnApagarUltimo">⌫ Apagar último</button>
+          <button class="btn" id="btnLimparFrase">Limpar</button>
+        </div>
+        <label class="muted check">
+          <input type="checkbox" id="falaAutomatica" checked> Falar cada sinal automaticamente
+        </label>
+      </div>
+      <div id="avisoTreino" class="aviso" hidden>
+        Ainda não há sinais treinados neste aparelho. Vá em <b>Treinar</b> e grave alguns exemplos de cada sinal.
+      </div>
+    </section>
+
+    <!-- TREINAR -->
+    <section class="tela" id="tela-treinar" role="tabpanel">
+      <div class="botoes">
+        <button class="btn primario grande" data-acao="camera">📷 Ligar câmera</button>
+      </div>
+      <div class="cartao">
+        <h2>Ensinar um sinal para o reconhecimento</h2>
+        <p class="muted">Grave de 5 a 10 exemplos de cada sinal (variando um pouco a posição). Cada gravação dura 1,2 s, depois de uma contagem regressiva.</p>
+        <input type="text" id="nomeSinal" list="sugestoesSinais" placeholder="Nome do sinal (ex.: OBRIGADO)" autocomplete="off">
+        <datalist id="sugestoesSinais"></datalist>
+        <div class="botoes" style="margin-top:10px">
+          <button class="btn primario grande" id="btnGravarExemplo">⏺ Gravar exemplo</button>
+        </div>
+        <p class="muted" id="treinoStatus"></p>
+      </div>
+      <div class="cartao">
+        <h2>Sinais aprendidos</h2>
+        <ul class="lista-sinais" id="listaSinais"></ul>
+        <div class="botoes" style="margin-top:10px">
+          <button class="btn" id="btnExportar">⬇ Exportar</button>
+          <label class="btn" for="arquivoImportar">⬆ Importar</label>
+          <input type="file" id="arquivoImportar" accept="application/json" hidden>
+        </div>
+      </div>
+      <div class="cartao">
+        <h2>Animações da Teté</h2>
+        <p class="muted">Os sinais que a Teté faz vêm dos vídeos da intérprete. Use o estúdio de captura para transformar um vídeo em animação 3D.</p>
+        <a class="btn" href="captura.html">🎬 Abrir estúdio de captura</a>
+      </div>
+    </section>
+  </main>
+
+  <nav class="abas" role="tablist">
+    <button role="tab" data-ir="inicio" aria-selected="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Início
+    </button>
+    <button role="tab" data-ir="voz" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Voz→Libras
+    </button>
+    <button role="tab" data-ir="libras" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 11V5a1.5 1.5 0 0 1 3 0v5M10 10V3.5a1.5 1.5 0 0 1 3 0V10M13 10V5a1.5 1.5 0 0 1 3 0v6M16 9.5a1.5 1.5 0 0 1 3 0V14a7 7 0 0 1-7 7h-.5A6.5 6.5 0 0 1 6 17l-2.4-4a1.5 1.5 0 0 1 2.5-1.6L7 13"/></svg>Libras→Voz
+    </button>
+    <button role="tab" data-ir="treinar" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg>Treinar
+    </button>
+  </nav>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
