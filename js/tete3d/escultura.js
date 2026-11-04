@@ -5,7 +5,7 @@
 // lábios e sobrancelhas).
 //
 // Inspirada na modelo de referência: rosto oval suave com bochechas discretas,
-// nariz pequeno, olhos grandes, cabelo castanho cacheado muito volumoso,
+// nariz pequeno e fino, olhos expressivos, cabelo castanho cacheado muito volumoso,
 // blusa gola alta canelada sem manga e jeans de cintura alta.
 
 import * as THREE from '../vendor/three.module.min.js';
@@ -20,8 +20,8 @@ export const K = 1.18;
 export const CABECA = {
   escala: K,
   centro: [0, 0.115 * K, 0.01 * K],
-  olho: (s) => [s * 0.036 * K, 0.123 * K, 0.072 * K], // centro do globo ocular
-  raioOlho: 0.0195 * K,
+  olho: (s) => [s * 0.036 * K, 0.123 * K, 0.074 * K], // centro do globo ocular
+  raioOlho: 0.0172 * K,
 };
 
 export function sdfCabeca(x, y, z) {
@@ -36,17 +36,17 @@ function sdfCabecaBase(x, y, z) {
   d = smin(d, elipsoide(px, py, pz, [0, -0.056, 0.026], [0.046, 0.044, 0.052]), 0.03); // mandíbula (afinada)
   d = smin(d, esfera(px, py, pz, [0, -0.084, 0.047], 0.016), 0.022); // queixo
   for (const s of [1, -1]) d = smin(d, elipsoide(px, py, pz, [s * 0.036, 0.035, 0.07], [0.024, 0.007, 0.011]), 0.014); // arco das sobrancelhas
-  // nariz pequeno e arrebitado
-  d = smin(d, cone(px, py, pz, [0, 0.0, 0.086], [0, -0.016, 0.096], 0.0062, 0.0092), 0.012);
-  d = smin(d, esfera(px, py, pz, [0, -0.021, 0.098], 0.0108), 0.009);
+  // nariz pequeno, fino e arrebitado
+  d = smin(d, cone(px, py, pz, [0, 0.002, 0.086], [0, -0.016, 0.0955], 0.0046, 0.0072), 0.01);
+  d = smin(d, esfera(px, py, pz, [0, -0.0205, 0.0965], 0.0086), 0.008);
   for (const s of [1, -1]) {
-    d = smin(d, esfera(px, py, pz, [s * 0.0112, -0.0275, 0.089], 0.0074), 0.007);
-    d = ssub(d, esfera(px, py, pz, [s * 0.0066, -0.033, 0.098], 0.0031), 0.003); // narinas
+    d = smin(d, esfera(px, py, pz, [s * 0.0092, -0.0262, 0.0885], 0.0058), 0.006);
+    d = ssub(d, esfera(px, py, pz, [s * 0.0054, -0.0305, 0.0955], 0.0023), 0.0025); // narinas
   }
   // região da boca levemente projetada (os lábios são malhas animadas por cima)
   d = smin(d, elipsoide(px, py, pz, [0, -0.052, 0.074], [0.026, 0.016, 0.018]), 0.02);
   // órbitas para os olhos
-  for (const s of [1, -1]) d = ssub(d, esfera(px, py, pz, [s * 0.036, 0.008, 0.062], 0.0212), 0.01);
+  for (const s of [1, -1]) d = ssub(d, esfera(px, py, pz, [s * 0.036, 0.008, 0.064], 0.0188), 0.009);
   // orelhas
   for (const s of [1, -1]) {
     d = smin(d, elipsoide(px, py, pz, [s * 0.089, 0.0, -0.008], [0.011, 0.024, 0.016]), 0.008);

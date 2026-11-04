@@ -68,8 +68,8 @@ function texturaIris() {
 // ----------------------------------------------------------------- olhos ---
 
 function criarOlho(mat, s, iris) {
-  const R = 0.0195;
-  const c = [s * 0.036, 0.123, 0.072];
+  const R = 0.0172;
+  const c = [s * 0.036, 0.123, 0.074];
   const grupo = new THREE.Group();
   grupo.position.set(...c);
 
@@ -77,7 +77,7 @@ function criarOlho(mat, s, iris) {
   const uv = geo.attributes.uv, p = geo.attributes.position;
   for (let i = 0; i < p.count; i++) { // íris mapeada de frente (projeção planar)
     const frente = p.getZ(i) > 0;
-    uv.setXY(i, frente ? 0.5 + (p.getX(i) / R) * 0.4 : 0.03, frente ? 0.5 + (p.getY(i) / R) * 0.4 : 0.03);
+    uv.setXY(i, frente ? 0.5 + (p.getX(i) / R) * 0.45 : 0.03, frente ? 0.5 + (p.getY(i) / R) * 0.45 : 0.03);
   }
   const giro = new THREE.Group();
   giro.add(new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({ map: iris, roughness: 0.4 })));
@@ -99,20 +99,20 @@ function criarOlho(mat, s, iris) {
   const sup = new THREE.Group();
   sup.add(new THREE.Mesh(new THREE.SphereGeometry(Rp, 48, 20, 0, Math.PI * 2, 0, th), mat.pele));
   const rB = Rp * Math.sin(th), yB = Rp * Math.cos(th);
-  const borda = new THREE.Mesh(new THREE.TorusGeometry(rB, 0.0011, 8, 48, Math.PI), mat.cilios);
+  const borda = new THREE.Mesh(new THREE.TorusGeometry(rB, 0.00078, 8, 48, Math.PI), mat.cilios);
   borda.rotation.x = Math.PI / 2;
   borda.position.y = yB;
   sup.add(borda);
   for (let k = 0; k < 13; k++) {
     const t = k / 12;
     const ang = Math.PI * (s > 0 ? 0.62 - 0.56 * t : 0.38 + 0.56 * t);
-    const fio = new THREE.Mesh(new THREE.ConeGeometry(0.00055, 0.0032 + 0.003 * t * t, 4), mat.cilios);
+    const fio = new THREE.Mesh(new THREE.ConeGeometry(0.0004, 0.0024 + 0.0024 * t * t, 4), mat.cilios);
     fio.position.set(Math.cos(ang) * rB * 1.01, yB + 0.0004, Math.sin(ang) * rB * 1.01);
     fio.rotation.set(1.05, 0, -s * 0.5 * t);
     sup.add(fio);
   }
   grupo.add(sup);
-  const inf = new THREE.Mesh(new THREE.SphereGeometry(R * 1.05, 48, 10, 0, Math.PI * 2, Math.PI * 0.76, Math.PI * 0.24), mat.pele);
+  const inf = new THREE.Mesh(new THREE.SphereGeometry(R * 1.05, 48, 10, 0, Math.PI * 2, Math.PI * 0.82, Math.PI * 0.18), mat.pele);
   grupo.add(inf);
 
   return {
@@ -169,7 +169,7 @@ function criarBoca(mat, zEm) {
       const ch = `${sorriso.toFixed(2)}|${abre.toFixed(2)}`;
       if (ch === ultimo) return;
       ultimo = ch;
-      const w = 0.0205 + sorriso * 0.004 - abre * 0.0025;
+      const w = 0.0172 + sorriso * 0.0032 - abre * 0.002;
       const yc = YM + 0.0008 + sorriso * 0.005;
       const ab = abre * 0.012;
       const n = (x) => x / w;
@@ -177,13 +177,13 @@ function criarBoca(mat, zEm) {
       const lI = (x) => YM - ab * Math.max(0, 1 - n(x) ** 2) ** 0.8 + (yc - YM) * n(x) ** 2;
       const topo = (x) => {
         const a = Math.abs(n(x));
-        return lS(x) + (0.0058 * Math.max(0, 1 - a ** 2.2) + 0.0016 * gauss(a - 0.3, 0.13) - 0.0015 * gauss(a, 0.07)) * (1 - sorriso * 0.2);
+        return lS(x) + (0.0044 * Math.max(0, 1 - a ** 2.2) + 0.0013 * gauss(a - 0.3, 0.12) - 0.0012 * gauss(a, 0.065)) * (1 - sorriso * 0.2);
       };
-      const base = (x) => lI(x) - 0.0074 * Math.max(0, 1 - Math.abs(n(x)) ** 1.8) * (1 - sorriso * 0.12);
+      const base = (x) => lI(x) - 0.0058 * Math.max(0, 1 - Math.abs(n(x)) ** 1.8) * (1 - sorriso * 0.12);
       const vol = (k) => (x) => 0.0009 + k * Math.max(0, 1 - Math.abs(n(x)) ** 2);
       for (const x of Object.values(m)) x.geometry.dispose();
-      m.sup.geometry = geo([...curva(topo, -w, w), ...curva(lS, w, -w)], vol(0.0026));
-      m.inf.geometry = geo([...curva(lI, -w, w), ...curva(base, w, -w)], vol(0.0032));
+      m.sup.geometry = geo([...curva(topo, -w, w), ...curva(lS, w, -w)], vol(0.0019));
+      m.inf.geometry = geo([...curva(lI, -w, w), ...curva(base, w, -w)], vol(0.0024));
       const lInt = (x) => Math.min(lI(x), lS(x) - 0.0005);
       m.interior.geometry = geo([...curva(lS, -w * 1.01, w * 1.01), ...curva(lInt, w * 1.01, -w * 1.01)], 0.0004);
       const wd = w * 0.6;

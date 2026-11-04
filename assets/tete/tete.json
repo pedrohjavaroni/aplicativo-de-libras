@@ -308,8 +308,8 @@
   {
    "nome": "cabeca",
    "material": "rosto",
-   "vertices": 49368,
-   "triangulos": 98732,
+   "vertices": 48842,
+   "triangulos": 97684,
    "quantMin": [
     -0.13,
     -0.005,
@@ -322,15 +322,15 @@
    ],
    "posicao": {
     "offset": 3509168,
-    "tamanho": 296208
+    "tamanho": 293052
    },
    "normal": {
-    "offset": 3805376,
-    "tamanho": 148104
+    "offset": 3802220,
+    "tamanho": 146526
    },
    "indice": {
-    "offset": 3953480,
-    "tamanho": 592392,
+    "offset": 3948748,
+    "tamanho": 586104,
     "bits": 16
    },
    "rigido": "head"
@@ -351,15 +351,15 @@
     0.000006485084306095979
    ],
    "posicao": {
-    "offset": 4545872,
+    "offset": 4534852,
     "tamanho": 94824
    },
    "normal": {
-    "offset": 4640696,
+    "offset": 4629676,
     "tamanho": 47412
    },
    "indice": {
-    "offset": 4688108,
+    "offset": 4677088,
     "tamanho": 189624,
     "bits": 16
    },
