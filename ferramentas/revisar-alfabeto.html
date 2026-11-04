@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Revisar Alfabeto</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    main { max-width: 900px; padding-bottom: 24px; }
+    .letras { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 6px; }
+    .letras .btn { min-height: 48px; font-size: 1.2rem; }
+    .palco { height: min(60vh, 520px); }
+  </style>
+</head>
+<body>
+  <header class="topo">
+    <a class="logo" href="../index.html" aria-label="Voltar" style="text-decoration:none">←</a>
+    <h1>Revisar o alfabeto manual da Lia</h1>
+  </header>
+  <main>
+    <section class="palco"><div class="avatar3d" id="avatar"></div><div class="letreiro" id="letreiro" hidden></div>
+      <div class="controles-palco"><button class="btn mini" id="vel">1×</button></div></section>
+    <section class="cartao" style="margin-top:14px">
+      <h2>Letras</h2>
+      <p class="muted">O alfabeto é gerado por código e precisa ser conferido pela intérprete. Letras com problema devem ser gravadas
+        e capturadas no estúdio com a glosa <code>LETRA-X</code>. Ajustes finos de configuração de mão ficam em
+        <code>js/avatar3d/pose.js</code> (MAOS) e de orientação/movimento em <code>js/avatar3d/solver.js</code> (ALFABETO).</p>
+      <div class="letras" id="letras"></div>
+      <div class="botoes" style="margin-top:12px">
+        <input type="text" id="palavra" placeholder="Soletrar uma palavra" style="flex:1">
+        <button class="btn primario" id="soletrar">Soletrar</button>
+      </div>
+    </section>
+  </main>
+  <script type="module">
+    import { criarAvatar3D } from '../js/avatar3d/avatar.js';
+    import { ALFABETO, clipDatilologia } from '../js/avatar3d/solver.js';
+    const letreiro = document.getElementById('letreiro');
+    const lia = criarAvatar3D(document.getElementById('avatar'), {
+      aoMarcar(ev) {
+        if (ev.tipo === 'marca') { letreiro.hidden = false; letreiro.textContent = ev.marca.texto; }
+        if (ev.tipo === 'ocioso') letreiro.hidden = true;
+      },
+    });
+    for (const l of Object.keys(ALFABETO)) {
+      const b = document.createElement('button');
+      b.className = 'btn'; b.textContent = l;
+      b.onclick = () => { lia.parar(); const c = clipDatilologia(l); c.segurar = 1.5; lia.tocar(c); };
+      document.getElementById('letras').append(b);
+    }
+    document.getElementById('soletrar').onclick = () => { lia.parar(); lia.datilologia(document.getElementById('palavra').value); };
+    let v = 1;
+    document.getElementById('vel').onclick = (e) => { v = v === 1 ? 0.5 : v === 0.5 ? 0.25 : 1; lia.velocidade(v); e.target.textContent = v + '×'; };
+  </script>
+</body>
+</html>

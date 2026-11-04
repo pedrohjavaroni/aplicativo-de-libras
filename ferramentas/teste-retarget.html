@@ -1,0 +1,41 @@
+<!doctype html><meta charset="utf-8"><title>Teste do retargeting</title><body style="font-family:monospace"><h1>Teste: retargeting MediaPipe → Lia</h1><p>Gera landmarks sintéticos a partir de poses conhecidas, reconstrói pela captura e mede o erro.</p><pre id="o"></pre><script type="module">
+import * as THREE from '../js/vendor/three.module.min.js';
+import { criarEsqueleto } from '../js/avatar3d/rig.js';
+import { resolverPose } from '../js/avatar3d/solver.js';
+import { quadroDeDeteccao } from '../js/avatar3d/retarget.js';
+const out=[];
+const casos = {
+  V_erguido: { right: { alvo:[-0.17,1.39,0.23], dedos:[0,1,0], palma:[0,0,1], mao:'V' } },
+  C_lado: { right: { alvo:[-0.1,1.3,0.3], dedos:[0.3,1,0.2], palma:[1,0,0.3], mao:'C' }, left: { alvo:[0.25,1.2,0.25], dedos:[0.4,0.3,0.8], palma:[0,1,0], mao:'A' } },
+  cabeca_virada: { cabeca:[10,25,-8], tronco:[0,15,0], right:{ alvo:[0.05,1.25,0.32], dedos:[1,0,0.3], palma:[0,0,1], mao:'Y' } },
+};
+function aplicar(sk, q){ for(const n in q) sk.ossos[n].quaternion.fromArray(q[n]); sk.raiz.updateMatrixWorld(true); }
+const P = (sk,n)=>sk.ossos[n].getWorldPosition(new THREE.Vector3());
+const ponta = (sk,n)=>{const o=sk.ossos[n]; const q=o.getWorldQuaternion(new THREE.Quaternion()); return P(sk,n).add(new THREE.Vector3(0,-0.02,0).applyQuaternion(q));};
+const mp = (v)=>({x:v.x,y:-v.y,z:-v.z,visibility:1});
+for (const [nome,spec] of Object.entries(casos)) {
+  const ref = criarEsqueleto(); aplicar(ref, resolverPose(spec));
+  const pose = []; for(let i=0;i<33;i++) pose.push({x:0,y:0,z:0,visibility:0});
+  pose[11]=mp(P(ref,'leftUpperArm')); pose[12]=mp(P(ref,'rightUpperArm'));
+  pose[13]=mp(P(ref,'leftLowerArm')); pose[14]=mp(P(ref,'rightLowerArm'));
+  pose[15]=mp(P(ref,'leftHand')); pose[16]=mp(P(ref,'rightHand'));
+  const hq = ref.ossos.head.getWorldQuaternion(new THREE.Quaternion()); const hp=P(ref,'head').add(new THREE.Vector3(0,0.09,0).applyQuaternion(hq));
+  pose[7]=mp(hp.clone().add(new THREE.Vector3(0.08,0,0).applyQuaternion(hq))); pose[8]=mp(hp.clone().add(new THREE.Vector3(-0.08,0,0).applyQuaternion(hq)));
+  pose[0]=mp(hp.clone().add(new THREE.Vector3(0,-0.0268,0.1).applyQuaternion(hq)));
+  const maos={};
+  for (const lado of ['left','right']) {
+    const L=[P(ref,lado+'Hand')];
+    for (const d of ['Thumb','Index','Middle','Ring','Little']) { L.push(P(ref,lado+d+'Proximal'),P(ref,lado+d+'Intermediate'),P(ref,lado+d+'Distal'),ponta(ref,lado+d+'Distal')); }
+    maos[lado]={mundo:L.map(mp)};
+  }
+  const q = quadroDeDeteccao({poseMundo:pose, maos}).q;
+  const res = criarEsqueleto(); aplicar(res, q);
+  let maxErr=0, pior='';
+  for (const n of Object.keys(ref.ossos)) { if(!/Hand|Distal|LowerArm|head/.test(n)) continue;
+    const e = (/Distal/.test(n)? ponta(ref,n).distanceTo(ponta(res,n)) : P(ref,n).distanceTo(P(res,n)))*1000; if(e>maxErr){maxErr=e;pior=n;} }
+  const ang=(n)=>THREE.MathUtils.radToDeg(ref.ossos[n].getWorldQuaternion(new THREE.Quaternion()).angleTo(res.ossos[n].getWorldQuaternion(new THREE.Quaternion()))).toFixed(1);
+  out.push(`${nome}: cabeça ${ang('head')}°, peito ${ang('chest')}°, mão D ${ang('rightHand')}°`);
+  out.push(`${nome}: erro máximo ${maxErr.toFixed(1)} mm (${pior})`);
+}
+document.getElementById('o').textContent=out.join('\n'); window.feito=true;
+</script>

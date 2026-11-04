@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Estúdio de Captura</title>
+  <meta name="description" content="Transforma vídeos da intérprete sinalizando em animações 3D da Lia.">
+  <meta name="theme-color" content="#b8786a">
+  <link rel="icon" href="assets/icone-192.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    main { max-width: 1100px; padding-bottom: 32px; }
+    .grade { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    @media (min-width: 820px) { .grade { grid-template-columns: 1fr 1fr; } }
+    .midia { position: relative; background: #000; border-radius: var(--radius); overflow: hidden; aspect-ratio: 3 / 4; }
+    .midia video { width: 100%; height: 100%; object-fit: contain; }
+    .midia .vazio { position: absolute; inset: 0; display: grid; place-items: center; color: #ddd; text-align: center; padding: 24px; }
+    .palco.estudio { height: auto; aspect-ratio: 3 / 4; }
+    progress { width: 100%; height: 14px; accent-color: var(--primary); }
+    .campos { display: grid; gap: 10px; }
+    .campos label { font-weight: 700; font-size: .9rem; display: grid; gap: 4px; }
+    .campos label.check { display: flex; font-weight: 600; margin: 0; }
+    ol.dicas { margin: 0; padding-left: 20px; color: var(--muted); font-size: .92rem; line-height: 1.5; }
+    .lista-sinais code { font-size: .8rem; }
+  </style>
+</head>
+<body>
+  <header class="topo">
+    <a class="logo" href="index.html" aria-label="Voltar ao app" style="text-decoration:none">←</a>
+    <h1>Estúdio de captura · vídeos da intérprete → Lia 3D</h1>
+  </header>
+  <main>
+    <div class="grade">
+      <section class="cartao">
+        <h2>1. Vídeo da intérprete</h2>
+        <div class="midia">
+          <video id="video" playsinline muted controls></video>
+          <div class="vazio" id="vazio">Escolha um vídeo ou grave agora.<br>Enquadramento: da cintura para cima, de frente, fundo liso.</div>
+        </div>
+        <div class="botoes" style="margin-top:10px">
+          <label class="btn" for="arquivo">📁 Escolher vídeo</label>
+          <input type="file" id="arquivo" accept="video/*" hidden>
+          <button class="btn" id="btnGravar">⏺ Gravar com a câmera</button>
+        </div>
+      </section>
+
+      <section class="cartao">
+        <h2>2. Pré-visualização na Lia</h2>
+        <div class="palco estudio" id="palco">
+          <div class="avatar3d" id="avatar"></div>
+          <div class="letreiro" id="letreiro" hidden></div>
+        </div>
+        <div class="botoes" style="margin-top:10px">
+          <button class="btn" id="btnTocar" disabled>▶ Tocar</button>
+          <label class="muted check" style="margin:0"><input type="checkbox" id="loop" checked> repetir</label>
+        </div>
+      </section>
+    </div>
+
+    <section class="cartao" style="margin-top:14px">
+      <h2>3. Dados do sinal</h2>
+      <div class="campos">
+        <label>Glosa (nome do sinal em Libras)
+          <input type="text" id="glosa" placeholder="Ex.: OBRIGADO  ·  para letras do alfabeto: LETRA-A" autocomplete="off">
+        </label>
+        <label>Palavras em português que usam este sinal (separadas por vírgula)
+          <input type="text" id="palavras" placeholder="obrigado, obrigada, valeu" autocomplete="off">
+        </label>
+        <label class="check"><input type="checkbox" id="aparar" checked> Cortar automaticamente o início e o fim sem mãos</label>
+        <label class="check"><input type="checkbox" id="rosto" checked> Capturar expressões faciais (marcadores não manuais)</label>
+        <label class="check"><input type="checkbox" id="espelhado"> Vídeo espelhado (gravado com a câmera frontal do celular)</label>
+      </div>
+      <div class="botoes" style="margin-top:12px">
+        <button class="btn primario grande" id="btnProcessar" disabled>⚙ Gerar animação 3D</button>
+      </div>
+      <progress id="progresso" value="0" max="1" hidden></progress>
+      <p class="muted" id="status"></p>
+      <div class="botoes">
+        <button class="btn primario" id="btnSalvar" disabled>💾 Salvar neste aparelho</button>
+        <button class="btn" id="btnBaixar" disabled>⬇ Baixar .json (para o repositório)</button>
+      </div>
+    </section>
+
+    <section class="cartao" style="margin-top:14px">
+      <h2>Sinais capturados neste aparelho</h2>
+      <ul class="lista-sinais" id="lista"></ul>
+    </section>
+
+    <section class="cartao" style="margin-top:14px">
+      <h2>Dicas de gravação</h2>
+      <ol class="dicas">
+        <li>Um sinal por vídeo, começando e terminando com as mãos em repouso.</li>
+        <li>Câmera parada, na altura do peito, a ~1,5 m. Enquadre da cintura até acima da cabeça, com os cotovelos visíveis.</li>
+        <li>Boa luz de frente, fundo liso e contrastante com a pele; roupa lisa (a blusa terracota é ótima).</li>
+        <li>Sinalize em velocidade natural; 30 fps ou mais. Evite que uma mão esconda a outra por muito tempo.</li>
+        <li>Para o alfabeto manual, use a glosa <code>LETRA-A</code>, <code>LETRA-B</code>… — a Lia passa a usar a letra capturada na datilologia.</li>
+        <li>Para publicar para todos: baixe o .json, coloque em <code>dados/sinais/</code> e adicione <code>"animacao"</code> no <code>dados/dicionario.json</code>.</li>
+      </ol>
+    </section>
+  </main>
+  <script type="module" src="js/captura.js"></script>
+</body>
+</html>
