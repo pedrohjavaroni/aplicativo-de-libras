@@ -44,17 +44,16 @@ function texturaIris() {
     const c = t / 2, r = t * 0.46;
     g.fillStyle = '#fbf6f1'; g.fillRect(0, 0, t, t);
     const base = g.createRadialGradient(c, c, r * 0.15, c, c, r);
-    // castanho-mel (como nas fotos)
-    base.addColorStop(0, '#d6a35a');
-    base.addColorStop(0.3, '#b07a3e');
-    base.addColorStop(0.55, '#86552e');
-    base.addColorStop(0.85, '#5c3820');
-    base.addColorStop(1, '#2c1b10');
+    base.addColorStop(0, '#d2a35c');
+    base.addColorStop(0.3, '#a8a36e');
+    base.addColorStop(0.5, '#86a397');
+    base.addColorStop(0.85, '#5f7d73');
+    base.addColorStop(1, '#2b3a36');
     g.fillStyle = base; g.beginPath(); g.arc(c, c, r, 0, 7); g.fill();
     const rnd = aleatorio(5);
     for (let i = 0; i < 520; i++) {
       const a = rnd() * Math.PI * 2;
-      g.strokeStyle = rnd() < 0.5 ? 'rgba(250,225,180,.2)' : 'rgba(50,28,15,.3)';
+      g.strokeStyle = rnd() < 0.5 ? 'rgba(230,240,225,.22)' : 'rgba(35,55,50,.28)';
       g.lineWidth = 0.8 + rnd() * 1.8;
       g.beginPath();
       g.moveTo(c + Math.cos(a) * r * 0.3, c + Math.sin(a) * r * 0.3);
@@ -78,7 +77,7 @@ function criarOlho(mat, s, iris) {
   const uv = geo.attributes.uv, p = geo.attributes.position;
   for (let i = 0; i < p.count; i++) { // íris mapeada de frente (projeção planar)
     const frente = p.getZ(i) > 0;
-    uv.setXY(i, frente ? 0.5 + (p.getX(i) / R) * 0.41 : 0.03, frente ? 0.5 + (p.getY(i) / R) * 0.41 : 0.03);
+    uv.setXY(i, frente ? 0.5 + (p.getX(i) / R) * 0.45 : 0.03, frente ? 0.5 + (p.getY(i) / R) * 0.45 : 0.03);
   }
   const giro = new THREE.Group();
   giro.add(new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({ map: iris, roughness: 0.4 })));
@@ -100,14 +99,14 @@ function criarOlho(mat, s, iris) {
   const sup = new THREE.Group();
   sup.add(new THREE.Mesh(new THREE.SphereGeometry(Rp, 48, 20, 0, Math.PI * 2, 0, th), mat.pele));
   const rB = Rp * Math.sin(th), yB = Rp * Math.cos(th);
-  const borda = new THREE.Mesh(new THREE.TorusGeometry(rB, 0.0013, 8, 48, Math.PI), mat.cilios);
+  const borda = new THREE.Mesh(new THREE.TorusGeometry(rB, 0.00078, 8, 48, Math.PI), mat.cilios);
   borda.rotation.x = Math.PI / 2;
   borda.position.y = yB;
   sup.add(borda);
   for (let k = 0; k < 13; k++) {
     const t = k / 12;
     const ang = Math.PI * (s > 0 ? 0.62 - 0.56 * t : 0.38 + 0.56 * t);
-    const fio = new THREE.Mesh(new THREE.ConeGeometry(0.00055, 0.0028 + 0.0032 * t * t, 4), mat.cilios);
+    const fio = new THREE.Mesh(new THREE.ConeGeometry(0.0004, 0.0024 + 0.0024 * t * t, 4), mat.cilios);
     fio.position.set(Math.cos(ang) * rB * 1.01, yB + 0.0004, Math.sin(ang) * rB * 1.01);
     fio.rotation.set(1.05, 0, -s * 0.5 * t);
     sup.add(fio);
@@ -135,7 +134,7 @@ function criarSobrancelha(mat, s, zEm) {
     const t = i / 24;
     const x = 0.0135 + 0.043 * t;
     const y = 0.1505 + 0.0075 * Math.sin(Math.PI * Math.min(t / 0.62, 1) * 0.5) - (t > 0.62 ? 0.0075 * ((t - 0.62) / 0.38) ** 1.4 : 0);
-    const e = 0.0034 * (1 - t) + 0.0014 * t + 0.0013 * Math.sin(Math.PI * t);
+    const e = 0.0028 * (1 - t) + 0.0012 * t + 0.0011 * Math.sin(Math.PI * t);
     pts.push([x, y, e]);
   }
   forma.moveTo(pts[0][0], pts[0][1] - pts[0][2] / 2);
@@ -159,7 +158,7 @@ function criarBoca(mat, zEm) {
   m.sup.material = mat.labios.clone();
   m.sup.material.color.offsetHSL(0, 0.02, -0.06); // lábio superior um pouco mais escuro
   Object.values(m).forEach((x, i) => { x.renderOrder = i; grupo.add(x); });
-  const YM = 0.066;
+  const YM = 0.063;
   let ultimo = '';
   const curva = (fn, a, b, n = 30) => Array.from({ length: n + 1 }, (_, i) => { const x = a + ((b - a) * i) / n; return new THREE.Vector2(x, fn(x)); });
   const geo = (pts, off) => projetar(new THREE.ShapeGeometry(new THREE.Shape(pts), 1), zEm, off);
@@ -170,7 +169,7 @@ function criarBoca(mat, zEm) {
       const ch = `${sorriso.toFixed(2)}|${abre.toFixed(2)}`;
       if (ch === ultimo) return;
       ultimo = ch;
-      const w = 0.0182 + sorriso * 0.0036 - abre * 0.002;
+      const w = 0.0172 + sorriso * 0.0032 - abre * 0.002;
       const yc = YM + 0.0008 + sorriso * 0.005;
       const ab = abre * 0.012;
       const n = (x) => x / w;
@@ -178,9 +177,9 @@ function criarBoca(mat, zEm) {
       const lI = (x) => YM - ab * Math.max(0, 1 - n(x) ** 2) ** 0.8 + (yc - YM) * n(x) ** 2;
       const topo = (x) => {
         const a = Math.abs(n(x));
-        return lS(x) + (0.0048 * Math.max(0, 1 - a ** 2.2) + 0.0013 * gauss(a - 0.3, 0.12) - 0.0012 * gauss(a, 0.065)) * (1 - sorriso * 0.2);
+        return lS(x) + (0.0044 * Math.max(0, 1 - a ** 2.2) + 0.0013 * gauss(a - 0.3, 0.12) - 0.0012 * gauss(a, 0.065)) * (1 - sorriso * 0.2);
       };
-      const base = (x) => lI(x) - 0.0066 * Math.max(0, 1 - Math.abs(n(x)) ** 1.8) * (1 - sorriso * 0.12);
+      const base = (x) => lI(x) - 0.0058 * Math.max(0, 1 - Math.abs(n(x)) ** 1.8) * (1 - sorriso * 0.12);
       const vol = (k) => (x) => 0.0009 + k * Math.max(0, 1 - Math.abs(n(x)) ** 2);
       for (const x of Object.values(m)) x.geometry.dispose();
       m.sup.geometry = geo([...curva(topo, -w, w), ...curva(lS, w, -w)], vol(0.0019));
@@ -231,7 +230,6 @@ export function criarRosto(cabeca, mat, { oculos = false } = {}) {
   const zEm = superficie();
   const grupo = new THREE.Group();
   grupo.scale.setScalar(K);
-  grupo.position.y = CABECA.descer;
   cabeca.add(grupo);
   const iris = texturaIris();
   const olhos = [criarOlho(mat, 1, iris), criarOlho(mat, -1, iris)];

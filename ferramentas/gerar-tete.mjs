@@ -100,15 +100,6 @@ for (const p of partes) {
     quantMin: qmin, quantEscala: qesc,
     posicao: adicionar(qpos), normal: adicionar(qnor), indice: { ...adicionar(indices), bits: nv < 65536 ? 16 : 32 },
   };
-  if (p.cor) {
-    const lin = (c) => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
-    const cor = new Uint8Array(nv * 3);
-    for (let v = 0; v < nv; v++) {
-      const c = p.cor(pos[v * 3], pos[v * 3 + 1], pos[v * 3 + 2]);
-      for (let k = 0; k < 3; k++) cor[v * 3 + k] = Math.round(lin(c[k]) * 255);
-    }
-    malha.cor = adicionar(cor);
-  }
   if (p.rigido) malha.rigido = p.rigido;
   else {
     const si = new Uint8Array(nv * 4), sw = new Uint8Array(nv * 4);

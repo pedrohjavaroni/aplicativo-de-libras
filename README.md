@@ -18,7 +18,7 @@ A Teté é uma intérprete **3D em estilo de animação**, inspirada nas fotos d
 2. **Malha gerada offline** (`ferramentas/gerar-tete.mjs`). As superfícies são extraídas (*surface nets*), recebem normais suaves e **pesos de osso** por vértice, e são gravadas em `assets/tete/` (~4,9 MB, ~3,2 MB comprimido pelo servidor). Para regerar depois de mudar a escultura: `node ferramentas/gerar-tete.mjs`.
 3. **Pele animada pelo esqueleto** (`SkinnedMesh`). Cotovelos, punhos e cada falange dobram como pele. A torção da mão é distribuída pelo antebraço para o punho não "torcer como papel de bala".
 4. **Rosto vivo** (`js/tete3d/rosto.js`). Olhos com íris detalhada, córnea brilhante e reflexo, pálpebras que piscam, cílios, sobrancelhas expressivas, lábios que sorriem e abrem na fala, e óculos.
-5. **Cabelo esculpido em mechas** (`js/tete3d/escultura.js`). Cerca de 100 mechas cacheadas grossas, em espiral e afinando na ponta, fundidas numa superfície única e lisa, como em filmes de animação. A cor está gravada no modelo: raiz escura e pontas mel. O rosto e o pescoço ficam sempre livres.
+5. **Cachos** (`js/tete3d/cachos.js`). Centenas de mechas em espiral sobre o volume esculpido do cabelo, sempre deixando o rosto livre.
 
 | Parâmetro da Libras | Como a Teté reproduz |
 |---|---|
@@ -89,6 +89,7 @@ js/tete3d/               a personagem
   sdf.js                primitivas e uniões suaves
   carregar.js           carrega assets/tete/ e liga ao esqueleto (SkinnedMesh)
   rosto.js              olhos, pálpebras, sobrancelhas, lábios, óculos
+  cachos.js             cachos em espiral
   materiais.js          pele, tricô canelado, jeans, ouro, luz de estúdio
   tete.js               cena, câmera e API (tocar, datilologia, gesto, falando…)
 ferramentas/gerar-tete.mjs  gera as malhas da Teté (Node.js)

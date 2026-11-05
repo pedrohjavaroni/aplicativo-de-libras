@@ -1,7 +1,6 @@
 // Carrega as malhas geradas (assets/tete/) e as liga ao esqueleto animado.
 import * as THREE from '../vendor/three.module.min.js';
 import { criarEsqueleto, aplicarPoseLigacao } from '../movimento/rig.js';
-import { CABECA } from './escultura.js';
 
 let cacheDados = null;
 
@@ -37,11 +36,9 @@ export async function carregarMalhas(ossos, materiais, base = 'assets/tete/') {
     g.setAttribute('normal', new THREE.BufferAttribute(new Int8Array(bin, m.normal.offset, m.vertices * 3), 3, true));
     const Indices = m.indice.bits === 16 ? Uint16Array : Uint32Array;
     g.setIndex(new THREE.BufferAttribute(new Indices(bin, m.indice.offset, m.triangulos * 3), 1));
-    if (m.cor) g.setAttribute('color', new THREE.BufferAttribute(new Uint8Array(bin, m.cor.offset, m.vertices * 3), 3, true));
     let malha;
     if (m.rigido) {
       malha = new THREE.Mesh(g, materiais[m.material]);
-      if (m.rigido === 'head') malha.position.y = CABECA.descer;
       ossos[m.rigido].add(malha);
     } else {
       g.setAttribute('skinIndex', new THREE.BufferAttribute(new Uint8Array(bin, m.ossoIndice.offset, m.vertices * 4), 4));

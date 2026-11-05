@@ -22,8 +22,6 @@ export function cone(px, py, pz, a, b, r1, r2) {
   const bax = b[0] - a[0], bay = b[1] - a[1], baz = b[2] - a[2];
   const l2 = bax * bax + bay * bay + baz * baz;
   const rr = r1 - r2;
-  // trecho mais curto que a diferença dos raios: o cone vira só a esfera maior
-  if (l2 <= rr * rr * 1.0001 || l2 < 1e-12) return r1 >= r2 ? esfera(px, py, pz, a, r1) : esfera(px, py, pz, b, r2);
   const a2 = l2 - rr * rr;
   const il2 = 1 / l2;
   const pax = px - a[0], pay = py - a[1], paz = pz - a[2];

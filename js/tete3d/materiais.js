@@ -10,8 +10,8 @@ export const COR = {
   jeans: 0xa8c6e4,
   ouro: 0xd6ad62,
   cabelo: 0x3b2316,
-  labios: 0xd0665e,
-  sobrancelha: 0x4e2e1c,
+  labios: 0xc9625a,
+  sobrancelha: 0x5a3622,
 };
 
 export function textura(tam, desenhar, { repetir = false, srgb = true } = {}) {
@@ -38,7 +38,7 @@ function ruido(g, t, qtd, cor, alfa, raio, semente) {
 /**
  * Projeção de textura sem UV (a malha esculpida não tem UV): calcula a
  * coordenada no shader a partir da posição do vértice.
- *  - 'cilindro': em volta do eixo Y (texturas de tecido)
+ *  - 'cilindro': em volta do eixo Y (tricô canelado, jeans)
  *  - 'frente': projeção frontal (maquiagem do rosto)
  */
 function projetar(material, modo, escala) {
@@ -97,26 +97,34 @@ function texturaRosto() {
     }
     mancha(0, 0.093, 0.01, 'rgba(255,150,140,0.35)'); // ponta do nariz
     const rnd = aleatorio(21);
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 46; i++) {
       const s = i % 2 ? 1 : -1;
       const x = s * (0.006 + rnd() * 0.05), y = 0.1 - rnd() * 0.03;
       if (Math.abs(x) < 0.01 && y < 0.095) continue;
-      mancha(x, y, 0.0009 + rnd() * 0.0007, `rgba(175,110,80,${0.12 + rnd() * 0.15})`);
+      mancha(x, y, 0.0009 + rnd() * 0.0007, `rgba(170,100,70,${0.18 + rnd() * 0.25})`);
     }
   });
 }
 
 export function criarMateriais() {
   const pele = new THREE.MeshPhysicalMaterial({
-    color: COR.pele, roughness: 0.62, sheen: 0.3, sheenRoughness: 0.6, sheenColor: new THREE.Color(0xff9a80),
-    clearcoat: 0.04, clearcoatRoughness: 0.6,
+    color: COR.pele, roughness: 0.5, sheen: 0.5, sheenRoughness: 0.5, sheenColor: new THREE.Color(0xff8e72),
+    clearcoat: 0.12, clearcoatRoughness: 0.55,
   });
   const rosto = projetar(pele.clone(), 'frente', new THREE.Vector2(4.5 / CABECA.escala, 4.5 / CABECA.escala));
   rosto.map = texturaRosto();
 
+  const canelado = textura(256, (g, t) => {
+    g.fillStyle = '#808080'; g.fillRect(0, 0, t, t);
+    for (let x = 0; x < t; x += 16) {
+      const grad = g.createLinearGradient(x, 0, x + 16, 0);
+      grad.addColorStop(0, '#303030'); grad.addColorStop(0.5, '#f0f0f0'); grad.addColorStop(1, '#303030');
+      g.fillStyle = grad; g.fillRect(x, 0, 16, t);
+    }
+  }, { repetir: true, srgb: false });
   const blusa = projetar(new THREE.MeshPhysicalMaterial({
     color: COR.blusa, roughness: 0.85, sheen: 0.9, sheenRoughness: 0.5, sheenColor: new THREE.Color(0xf2b49a),
-    // tecido liso (sem relevo): visual mais limpo, de animação
+    bumpMap: canelado, bumpScale: 0.12,
   }), 'cilindro', new THREE.Vector2(60, 1));
   // saia preta de malha, com brilho suave para mostrar o volume
   const saia = new THREE.MeshPhysicalMaterial({ color: COR.saia, roughness: 0.78, sheen: 0.5, sheenRoughness: 0.5, sheenColor: new THREE.Color(0x6a6a78) });
@@ -130,8 +138,7 @@ export function criarMateriais() {
   const jeans = projetar(new THREE.MeshStandardMaterial({ map: sarja, roughness: 0.92, bumpMap: sarja, bumpScale: 0.4 }), 'cilindro', new THREE.Vector2(8, 8));
 
   const cabeloBase = new THREE.MeshPhysicalMaterial({
-    vertexColors: true, roughness: 0.5, sheen: 0.5, sheenRoughness: 0.4, sheenColor: new THREE.Color(0x9a6a44),
-    clearcoat: 0.15, clearcoatRoughness: 0.4, envMapIntensity: 0.6,
+    color: 0x3a2316, roughness: 0.6, sheen: 0.4, sheenRoughness: 0.45, sheenColor: new THREE.Color(0x6a4630), envMapIntensity: 0.5,
   });
   const cabelo = new THREE.MeshPhysicalMaterial({
     vertexColors: true, roughness: 0.45, sheen: 0.35, sheenRoughness: 0.4, sheenColor: new THREE.Color(0x6e4a32),

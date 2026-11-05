@@ -4,13 +4,14 @@
 //   ligadas ao esqueleto do motor de movimento (SkinnedMesh).
 // - Rosto vivo: olhos com íris e córnea, pálpebras que piscam, lábios que
 //   falam e sorriem, sobrancelhas expressivas, óculos dourados.
-// - Cabelo: mechas cacheadas esculpidas, com luzes (raiz escura, pontas mel).
+// - Cabelo: volume esculpido + cachos em mola.
 
 import * as THREE from '../vendor/three.module.min.js';
 import { criarMotor } from '../movimento/motor.js';
 import { criarMateriais, criarAmbiente } from './materiais.js';
 import { carregarMalhas } from './carregar.js';
 import { criarRosto } from './rosto.js';
+import { criarCachos } from './cachos.js';
 import { criarDetalhes } from './detalhes.js';
 
 export function criarTete(container, { aoMarcar, base, oculos = false } = {}) {
@@ -68,6 +69,7 @@ export function criarTete(container, { aoMarcar, base, oculos = false } = {}) {
   container.appendChild(aviso);
   const pronto = carregarMalhas(ossos, mat, base).then((malhas) => {
     rosto = criarRosto(ossos.head, mat, { oculos });
+    ossos.head.add(criarCachos(malhas.cabelo, mat));
     criarDetalhes(ossos, mat);
     aviso.remove();
     return malhas;

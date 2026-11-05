@@ -16,14 +16,12 @@ import { esfera, elipsoide, cone, caixa, toro, smin, ssub, smax, suave, aplicar,
 // Coordenadas locais do osso "head" (origem no topo do pescoço).
 
 // escala da cabeça: um pouco maior que o real, como em personagens de animação
-export const K = 1.23;
+export const K = 1.18;
 export const CABECA = {
   escala: K,
   centro: [0, 0.115 * K, 0.01 * K],
   olho: (s) => [s * 0.036 * K, 0.123 * K, 0.074 * K], // centro do globo ocular
   raioOlho: 0.0172 * K,
-  // a cabeça (malha, rosto e cabelo) fica um pouco mais baixa no osso: pescoço mais curto
-  descer: -0.04,
 };
 
 export function sdfCabeca(x, y, z) {
@@ -32,11 +30,11 @@ export function sdfCabeca(x, y, z) {
 
 function sdfCabecaBase(x, y, z) {
   const px = x, py = y - 0.115, pz = z - 0.01; // relativo ao centro da cabeça
-  let d = elipsoide(px, py, pz, [0, 0.016, -0.012], [0.088, 0.098, 0.097]); // crânio mais redondo
+  let d = elipsoide(px, py, pz, [0, 0.012, -0.012], [0.086, 0.1, 0.096]);
   d = smin(d, elipsoide(px, py, pz, [0, 0.05, 0.035], [0.074, 0.05, 0.062]), 0.03); // testa
-  for (const s of [1, -1]) d = smin(d, esfera(px, py, pz, [s * 0.041, -0.033, 0.037], 0.031), 0.032); // bochechas redondinhas
-  d = smin(d, elipsoide(px, py, pz, [0, -0.05, 0.025], [0.045, 0.041, 0.05]), 0.032); // mandíbula curta e delicada
-  d = smin(d, esfera(px, py, pz, [0, -0.077, 0.046], 0.015), 0.022); // queixo
+  for (const s of [1, -1]) d = smin(d, esfera(px, py, pz, [s * 0.04, -0.036, 0.036], 0.03), 0.03); // bochechas (suaves)
+  d = smin(d, elipsoide(px, py, pz, [0, -0.056, 0.026], [0.046, 0.044, 0.052]), 0.03); // mandíbula (afinada)
+  d = smin(d, esfera(px, py, pz, [0, -0.084, 0.047], 0.016), 0.022); // queixo
   for (const s of [1, -1]) d = smin(d, elipsoide(px, py, pz, [s * 0.036, 0.035, 0.07], [0.024, 0.007, 0.011]), 0.014); // arco das sobrancelhas
   // nariz pequeno, fino e arrebitado
   d = smin(d, cone(px, py, pz, [0, 0.002, 0.086], [0, -0.016, 0.0955], 0.0046, 0.0072), 0.01);
@@ -46,7 +44,7 @@ function sdfCabecaBase(x, y, z) {
     d = ssub(d, esfera(px, py, pz, [s * 0.0054, -0.0305, 0.0955], 0.0023), 0.0025); // narinas
   }
   // região da boca levemente projetada (os lábios são malhas animadas por cima)
-  d = smin(d, elipsoide(px, py, pz, [0, -0.049, 0.074], [0.026, 0.016, 0.018]), 0.02);
+  d = smin(d, elipsoide(px, py, pz, [0, -0.052, 0.074], [0.026, 0.016, 0.018]), 0.02);
   // órbitas para os olhos
   for (const s of [1, -1]) d = ssub(d, esfera(px, py, pz, [s * 0.036, 0.008, 0.064], 0.0188), 0.009);
   // orelhas
@@ -57,69 +55,26 @@ function sdfCabecaBase(x, y, z) {
   return d;
 }
 
-// Cabelo esculpido em MECHAS: cada mecha é um cacho grosso em espiral que nasce
-// no couro cabeludo, ganha volume e cai, afinando na ponta. Todas se fundem
-// suavemente entre si e com a "touca" de cabelo — uma superfície única e lisa,
-// como em filmes de animação. (Coordenadas-base do osso "head".)
-
-const ZONA_ROSTO = (q) => (q[2] > 0.035 && Math.abs(q[0]) < 0.082 && q[1] > 0.03 && q[1] < 0.172)
-  || (q[2] > -0.005 && Math.abs(q[0]) < 0.058 && q[1] < 0.035); // rosto e frente do pescoço livres
-
-/** Altura mínima do cabelo: acima dos ombros na frente e nas laterais; atrás
- * das costas ele pode descer mais. */
-export function limiteCabelo(z) {
-  return -0.07 - 0.12 * suave(-0.09, -0.12, z);
-}
-
-const MECHAS = (() => {
-  const rnd = aleatorio(57);
-  const H = [0, 0.13, -0.014];
+// Volume do cabelo: nuvem de "bolhas" de cachos ao redor da cabeça, caindo
+// até os ombros, com o rosto livre.
+const BOLHAS = (() => {
+  const rnd = aleatorio(31);
   const lista = [];
-  for (let tent = 0; tent < 8000 && lista.length < 100; tent++) {
+  const H = [0, 0.13, -0.012];
+  for (let i = 0; i < 3000 && lista.length < 140; i++) {
     const u = rnd() * 2 - 1, th = rnd() * Math.PI * 2;
-    const rr = Math.sqrt(1 - u * u);
-    const n = [rr * Math.cos(th), u, rr * Math.sin(th)];
-    if (n[1] < -0.2) continue;
-    if (n[2] > 0.3 && n[1] < 0.6 && Math.abs(n[0]) < 0.78) continue; // rosto
-    const raiz = [H[0] + n[0] * 0.09, H[1] + n[1] * 0.098, H[2] + n[2] * 0.096];
-    if (lista.some((m) => Math.hypot(m.raiz[0] - raiz[0], m.raiz[1] - raiz[1], m.raiz[2] - raiz[2]) < 0.03)) continue;
-    // direção lateral (para onde o cacho "abre"); na frente, sempre para os lados
-    const lat = [n[0], 0, n[2] > 0 ? n[2] * 0.15 : n[2]];
-    if (Math.abs(lat[0]) < 0.3) lat[0] = (lat[0] >= 0 ? 1 : -1) * 0.3;
-    const nl = Math.hypot(...lat); lat.forEach((c, k) => { lat[k] = c / nl; });
-    const topo = Math.max(0, n[1]);
-    const L = (0.075 + 0.13 * (1 - topo) + rnd() * 0.035) * (n[2] > 0.1 ? 0.75 : 1);
-    const voltas = 1.4 + rnd() * 1.0;
-    const fase = rnd() * Math.PI * 2;
-    const raio0 = 0.0135 + rnd() * 0.003;
-    // trajetória central
-    const pts = [];
-    let p = [...raiz], dir = [...n];
-    const N = 16;
-    for (let i2 = 0; i2 <= N; i2++) {
-      const t = i2 / N;
-      // espiral em volta da trajetória (plano perpendicular aproximado)
-      const b1 = [-lat[2], 0, lat[0]];
-      const b2 = [dir[1] * b1[2] - dir[2] * b1[1], dir[2] * b1[0] - dir[0] * b1[2], dir[0] * b1[1] - dir[1] * b1[0]];
-      const a = fase + t * voltas * Math.PI * 2;
-      const amp = 0.016 * suave(0.0, 0.35, t) * (1 - 0.25 * t);
-      const q = [0, 1, 2].map((k) => p[k] + (b1[k] * Math.cos(a) + b2[k] * Math.sin(a)) * amp);
-      if (ZONA_ROSTO(q) || q[1] < limiteCabelo(q[2]) + 0.01) break;
-      pts.push({ p: q, r: raio0 * (1 - 0.6 * t) + 0.0032 });
-      // abre um pouco para fora e logo cai com a gravidade
-      const alvo = [lat[0] * (0.7 - 0.6 * t) + n[0] * 0.2, n[1] * 0.2 - (0.7 + 1.5 * t), lat[2] * (0.7 - 0.6 * t) + n[2] * 0.2];
-      const na = Math.hypot(...alvo);
-      dir = dir.map((c, k) => c + (alvo[k] / na - c) * 0.3);
-      const nd = Math.hypot(...dir); dir = dir.map((c) => c / nd);
-      p = p.map((c, k) => c + dir[k] * (L / N));
-      // o volume não passa de ~15 cm do eixo da cabeça (silhueta controlada)
-      const hx = p[0], hz = p[2] + 0.014, hr = Math.hypot(hx, hz), max = 0.132 + 0.028 * suave(0.1, -0.05, p[1]);
-      if (hr > max) { p[0] = (hx / hr) * max; p[2] = (hz / hr) * max - 0.014; }
-    }
-    if (pts.length < 5) continue;
-    const c = [0, 1, 2].map((k) => pts.reduce((sm, e) => sm + e.p[k], 0) / pts.length);
-    const R = Math.max(...pts.map((e) => Math.hypot(e.p[0] - c[0], e.p[1] - c[1], e.p[2] - c[2]) + e.r));
-    lista.push({ raiz, pts, c, R });
+    const r = Math.sqrt(1 - u * u);
+    const nx = r * Math.cos(th), ny = u, nz = r * Math.sin(th);
+    if (ny < -0.2 && nz > 0.25) continue; // nada na frente do pescoço
+    if (nz > 0.45 && ny < 0.55 && Math.abs(nx) < 0.7) continue; // rosto livre
+    const desce = ny < 0 ? -ny : 0;
+    const c = [
+      // topo mais baixo e estreito; abre na altura do queixo e cai até os ombros
+      H[0] + nx * (ny > 0 ? 0.094 - ny * 0.012 : 0.1 + desce * 0.035),
+      H[1] + ny * (ny > 0 ? 0.098 : 0.25),
+      H[2] + nz * 0.102 - desce * 0.015,
+    ];
+    lista.push([c, 0.034 + rnd() * 0.014 - desce * 0.008]);
   }
   return lista;
 })();
@@ -128,33 +83,25 @@ export function sdfCabelo(x, y, z) {
   return sdfCabeloBase(x / K, y / K, z / K) * K;
 }
 
-function sdfCabeloBase(x, y, z) {
-  // "touca": cabelo rente à cabeça, com a linha do cabelo na testa
-  let d = elipsoide(x, y, z, [0, 0.13, -0.012], [0.095, 0.103, 0.102]);
-  d = ssub(d, elipsoide(x, y, z, [0, 0.088, 0.072], [0.083, 0.093, 0.078]), 0.012); // linha do cabelo mais baixa na testa
-  for (const m of MECHAS) {
-    const dc = Math.hypot(x - m.c[0], y - m.c[1], z - m.c[2]) - m.R;
-    if (dc > d + 0.012) continue;
-    let e = 1;
-    for (let k = 0; k < m.pts.length - 1; k++) {
-      const a = m.pts[k], b = m.pts[k + 1];
-      e = smin(e, cone(x, y, z, a.p, b.p, a.r, b.r), 0.004);
-    }
-    d = smin(d, e, 0.012);
-  }
-  d = ssub(d, elipsoide(x, y, z, [0, 0.215, 0.05], [0.003, 0.02, 0.06]), 0.005); // risca no meio
-  d = smax(d, limiteCabelo(z) - y, 0.02);
-  return d;
+/** Altura mínima do cabelo (coordenadas-base da cabeça): acima dos ombros na
+ * frente e nas laterais; atrás das costas ele pode descer mais. */
+export function limiteCabelo(z) {
+  return -0.07 - 0.13 * suave(-0.06, -0.095, z);
 }
 
-/** Cor do cabelo (luzes): raiz castanho-escura, pontas mel/caramelo. */
-export function corCabelo(x, y, z) {
-  const bx = x / K, by = y / K, bz = z / K;
-  const dist = Math.hypot(bx, (by - 0.13) * 0.95, bz + 0.014);
-  const t = Math.min(1, Math.max(0, suave(0.1, 0.19, dist) * 0.75 + suave(0.06, -0.1, by) * 0.45));
-  const raiz = [0x2a, 0x17, 0x0d], meio = [0x5a, 0x35, 0x1e], ponta = [0xb0, 0x7a, 0x44];
-  const mix = (a, b, k) => a.map((c, i) => c + (b[i] - c) * k);
-  return t < 0.5 ? mix(raiz, meio, t / 0.5) : mix(meio, ponta, (t - 0.5) / 0.5);
+function sdfCabeloBase(x, y, z) {
+  let d = 1;
+  for (const [c, r] of BOLHAS) {
+    const e = esfera(x, y, z, c, r);
+    if (e < d + 0.03) d = smin(d, e, 0.028);
+  }
+  // linha do cabelo e rosto livres
+  d = ssub(d, elipsoide(x, y, z, [0, 0.092, 0.07], [0.084, 0.105, 0.078]), 0.014);
+  d = ssub(d, cone(x, y, z, [0, -0.12, 0.03], [0, 0.03, 0.04], 0.055, 0.05), 0.02); // pescoço
+  d = ssub(d, elipsoide(x, y, z, [0, -0.045, 0.03], [0.07, 0.05, 0.06]), 0.015); // frente do pescoço e do queixo livres
+  d = smax(d, limiteCabelo(z) - y, 0.025); // até os ombros; atrás, cai sobre as costas
+  d = ssub(d, elipsoide(x, y, z, [0, 0.215, 0.05], [0.0035, 0.025, 0.07]), 0.006); // risca no meio
+  return d;
 }
 
 /** Superfície frontal do rosto: z para (x, y) no espaço da cabeça, por "sphere tracing". */
@@ -245,6 +192,7 @@ export function criarEscultura() {
     let d = tronco(x, y, z, 0.006);
     d = smin(d, elipsoide(x, y, z, [0, 1.072, 0.004], [0.126, 0.038, 0.092]), 0.03); // blusa "bufante" sobre a saia
     // franzido abaixo da pala dos ombros (pregas suaves)
+    d += 0.0011 * Math.sin(x * 230) * suave(1.27, 1.37, y) * (1 - suave(1.41, 1.45, y));
     // decote em V na frente + abertura arredondada do pescoço
     const k = 2.0, n = Math.hypot(1, k);
     const dentroV = Math.max(-(y - k * x - yV) / n, -(y + k * x - yV) / n, 0.035 - z);
@@ -286,7 +234,7 @@ export function criarEscultura() {
   // ---------------- pescoço e colo (pele que aparece no decote) ----------------
   const baseCabeca = pos(ossos.head);
   const sdfPescoco = (x, y, z) => {
-    let d = cone(x, y, z, [0, 1.40, -0.004], [0, baseCabeca[1] + 0.04, 0.008], 0.044, 0.041);
+    let d = cone(x, y, z, [0, 1.40, -0.004], [0, baseCabeca[1] + 0.06, 0.008], 0.041, 0.038);
     d = smin(d, smax(smax(tronco(x, y, z, 0), 1.29 - y, 0.02), Math.abs(x) - 0.085, 0.02), 0.03); // colo (só onde o decote mostra)
     for (const s of [1, -1]) d = smin(d, cone(x, y, z, [s * 0.012, 1.428, 0.045], [s * 0.07, 1.438, 0.03], 0.004, 0.003), 0.008); // clavículas suaves
     return d;
@@ -313,6 +261,7 @@ export function criarEscultura() {
       d = smin(d, cone(x, y, z, inicioPunho, fimPunho, 0.031, 0.031), 0.014); // punho de elástico (liso, por cima do pulso)
       // pregas suaves só no corpo da manga (o punho fica liso, sem borda ondulada)
       const ate = Math.hypot(x - W[0], y - W[1], z - W[2]);
+      d += 0.0012 * Math.sin((x * 0.6 + z) * 260 + y * 40) * suave(0.0, 0.02, Math.hypot(x - E[0], y - E[1], z - E[2])) * suave(0.06, 0.09, ate);
       return d;
     }
     const corrManga = [
@@ -396,7 +345,7 @@ export function criarEscultura() {
 
   // ---------------- cabeça e cabelo (rígidos, no espaço do osso "head") ----------------
   partes.push({ nome: 'cabeca', material: 'rosto', rigido: 'head', sdf: sdfCabeca, min: [-0.13, -0.005, -0.12], max: [0.13, 0.28, 0.15], passo: 0.0024 });
-  partes.push({ nome: 'cabelo', material: 'cabeloBase', rigido: 'head', sdf: sdfCabelo, cor: corCabelo, min: [-0.25, -0.2, -0.235], max: [0.25, 0.38, 0.19], passo: 0.0065 });
+  partes.push({ nome: 'cabelo', material: 'cabeloBase', rigido: 'head', sdf: sdfCabelo, min: [-0.25, -0.2, -0.235], max: [0.25, 0.38, 0.19], passo: 0.0065 });
 
   return { partes, ossos };
 }
