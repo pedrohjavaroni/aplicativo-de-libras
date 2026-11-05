@@ -10,8 +10,8 @@ export const COR = {
   jeans: 0xa8c6e4,
   ouro: 0xd6ad62,
   cabelo: 0x3b2316,
-  labios: 0xc9625a,
-  sobrancelha: 0x5a3622,
+  labios: 0xd0665e,
+  sobrancelha: 0x4e2e1c,
 };
 
 export function textura(tam, desenhar, { repetir = false, srgb = true } = {}) {
@@ -130,7 +130,8 @@ export function criarMateriais() {
   const jeans = projetar(new THREE.MeshStandardMaterial({ map: sarja, roughness: 0.92, bumpMap: sarja, bumpScale: 0.4 }), 'cilindro', new THREE.Vector2(8, 8));
 
   const cabeloBase = new THREE.MeshPhysicalMaterial({
-    color: 0x4a2c1a, roughness: 0.55, sheen: 0.6, sheenRoughness: 0.4, sheenColor: new THREE.Color(0x8a5c3a), envMapIntensity: 0.5,
+    vertexColors: true, roughness: 0.5, sheen: 0.5, sheenRoughness: 0.4, sheenColor: new THREE.Color(0x9a6a44),
+    clearcoat: 0.15, clearcoatRoughness: 0.4, envMapIntensity: 0.6,
   });
   const cabelo = new THREE.MeshPhysicalMaterial({
     vertexColors: true, roughness: 0.45, sheen: 0.35, sheenRoughness: 0.4, sheenColor: new THREE.Color(0x6e4a32),

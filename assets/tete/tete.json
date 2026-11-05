@@ -123,8 +123,8 @@
   {
    "nome": "pescoco",
    "material": "pele",
-   "vertices": 16960,
-   "triangulos": 33874,
+   "vertices": 16938,
+   "triangulos": 33872,
    "quantMin": [
     -0.2,
     1.28,
@@ -137,24 +137,24 @@
    ],
    "posicao": {
     "offset": 1331112,
-    "tamanho": 101760
+    "tamanho": 101628
    },
    "normal": {
-    "offset": 1432872,
-    "tamanho": 50880
+    "offset": 1432740,
+    "tamanho": 50814
    },
    "indice": {
-    "offset": 1483752,
-    "tamanho": 203244,
+    "offset": 1483556,
+    "tamanho": 203232,
     "bits": 16
    },
    "ossoIndice": {
-    "offset": 1686996,
-    "tamanho": 67840
+    "offset": 1686788,
+    "tamanho": 67752
    },
    "ossoPeso": {
-    "offset": 1754836,
-    "tamanho": 67840
+    "offset": 1754540,
+    "tamanho": 67752
    }
   },
   {
@@ -173,24 +173,24 @@
     0.000002531823588775129
    ],
    "posicao": {
-    "offset": 1822676,
+    "offset": 1822292,
     "tamanho": 91740
    },
    "normal": {
-    "offset": 1914416,
+    "offset": 1914032,
     "tamanho": 45870
    },
    "indice": {
-    "offset": 1960288,
+    "offset": 1959904,
     "tamanho": 183456,
     "bits": 16
    },
    "ossoIndice": {
-    "offset": 2143744,
+    "offset": 2143360,
     "tamanho": 61160
    },
    "ossoPeso": {
-    "offset": 2204904,
+    "offset": 2204520,
     "tamanho": 61160
    }
   },
@@ -210,24 +210,24 @@
     0.0000027801046321430344
    ],
    "posicao": {
-    "offset": 2266064,
+    "offset": 2265680,
     "tamanho": 167640
    },
    "normal": {
-    "offset": 2433704,
+    "offset": 2433320,
     "tamanho": 83820
    },
    "indice": {
-    "offset": 2517524,
+    "offset": 2517140,
     "tamanho": 335304,
     "bits": 16
    },
    "ossoIndice": {
-    "offset": 2852828,
+    "offset": 2852444,
     "tamanho": 111760
    },
    "ossoPeso": {
-    "offset": 2964588,
+    "offset": 2964204,
     "tamanho": 111760
    }
   },
@@ -247,24 +247,24 @@
     0.000002531823588775129
    ],
    "posicao": {
-    "offset": 3076348,
+    "offset": 3075964,
     "tamanho": 91812
    },
    "normal": {
-    "offset": 3168160,
+    "offset": 3167776,
     "tamanho": 45906
    },
    "indice": {
-    "offset": 3214068,
+    "offset": 3213684,
     "tamanho": 183600,
     "bits": 16
    },
    "ossoIndice": {
-    "offset": 3397668,
+    "offset": 3397284,
     "tamanho": 61208
    },
    "ossoPeso": {
-    "offset": 3458876,
+    "offset": 3458492,
     "tamanho": 61208
    }
   },
@@ -284,32 +284,32 @@
     0.0000027801046321430344
    ],
    "posicao": {
-    "offset": 3520084,
+    "offset": 3519700,
     "tamanho": 167400
    },
    "normal": {
-    "offset": 3687484,
+    "offset": 3687100,
     "tamanho": 83700
    },
    "indice": {
-    "offset": 3771184,
+    "offset": 3770800,
     "tamanho": 334848,
     "bits": 16
    },
    "ossoIndice": {
-    "offset": 4106032,
+    "offset": 4105648,
     "tamanho": 111600
    },
    "ossoPeso": {
-    "offset": 4217632,
+    "offset": 4217248,
     "tamanho": 111600
    }
   },
   {
    "nome": "cabeca",
    "material": "rosto",
-   "vertices": 48842,
-   "triangulos": 97684,
+   "vertices": 52515,
+   "triangulos": 104344,
    "quantMin": [
     -0.13,
     -0.005,
@@ -321,16 +321,16 @@
     0.000004119935912108034
    ],
    "posicao": {
-    "offset": 4329232,
-    "tamanho": 293052
+    "offset": 4328848,
+    "tamanho": 315090
    },
    "normal": {
-    "offset": 4622284,
-    "tamanho": 146526
+    "offset": 4643940,
+    "tamanho": 157545
    },
    "indice": {
-    "offset": 4768812,
-    "tamanho": 586104,
+    "offset": 4801488,
+    "tamanho": 626064,
     "bits": 16
    },
    "rigido": "head"
@@ -338,8 +338,8 @@
   {
    "nome": "cabelo",
    "material": "cabeloBase",
-   "vertices": 20840,
-   "triangulos": 41676,
+   "vertices": 24335,
+   "triangulos": 48650,
    "quantMin": [
     -0.25,
     -0.2,
@@ -351,17 +351,21 @@
     0.000006485084306095979
    ],
    "posicao": {
-    "offset": 5354916,
-    "tamanho": 125040
+    "offset": 5427552,
+    "tamanho": 146010
    },
    "normal": {
-    "offset": 5479956,
-    "tamanho": 62520
+    "offset": 5573564,
+    "tamanho": 73005
    },
    "indice": {
-    "offset": 5542476,
-    "tamanho": 250056,
+    "offset": 5646572,
+    "tamanho": 291900,
     "bits": 16
+   },
+   "cor": {
+    "offset": 5938472,
+    "tamanho": 73005
    },
    "rigido": "head"
   }

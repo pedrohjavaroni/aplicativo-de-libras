@@ -13,7 +13,7 @@ import { criarEsqueleto } from './rig.js';
 import { OSSOS_ANIMAVEIS } from './pose.js';
 import { POSE_REPOUSO, clipDatilologia, gestoAcenar, gestoExplicar, gestoOuvir, gestoComemorar } from './solver.js';
 
-export const ROSTO_NEUTRO = { boca: 0, sorriso: 0.7, sobrancelha: 0, piscar: 0 };
+export const ROSTO_NEUTRO = { boca: 0, sorriso: 0.9, sobrancelha: 0.15, piscar: 0 };
 
 const paraQuat = (arr, destino = new THREE.Quaternion()) => destino.set(arr[0], arr[1], arr[2], arr[3]);
 

@@ -6,7 +6,7 @@ const ARQUIVOS = [
   'js/app.js', 'js/captura.js', 'js/config.js',
   'js/movimento/motor.js', 'js/movimento/rig.js', 'js/movimento/pose.js', 'js/movimento/solver.js', 'js/movimento/retarget.js',
   'js/tete3d/tete.js', 'js/tete3d/carregar.js', 'js/tete3d/escultura.js', 'js/tete3d/sdf.js', 'js/tete3d/materiais.js',
-  'js/tete3d/rosto.js', 'js/tete3d/cachos.js', 'js/tete3d/detalhes.js', 'assets/tete/tete.json', 'assets/tete/tete.bin',
+  'js/tete3d/rosto.js', 'js/tete3d/detalhes.js', 'assets/tete/tete.json', 'assets/tete/tete.bin',
   'js/libras/glosa.js', 'js/libras/fala.js', 'js/libras/sinais.js', 'js/libras/reconhecedor.js',
   'js/vendor/three.module.min.js', 'dados/dicionario.json', 'assets/icone-192.png', 'assets/icone-512.png',
 ];
