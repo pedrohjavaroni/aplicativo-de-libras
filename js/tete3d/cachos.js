@@ -10,7 +10,7 @@ import { CABECA, limiteCabelo } from './escultura.js';
 const RAIZ = new THREE.Color(0x1f110a), MEIO = new THREE.Color(0x3b2214), PONTA = new THREE.Color(0x8f6038);
 
 /** Tubo de raio variável com cor por vértice (referencial por transporte paralelo). */
-function tubo(pontos, raio, cor, lados = 7) {
+function tubo(pontos, raio, cor, lados = 12) {
   const n = pontos.length;
   const pos = new Float32Array(n * lados * 3), nor = new Float32Array(n * lados * 3), col = new Float32Array(n * lados * 3);
   const T = new THREE.Vector3(), N = new THREE.Vector3(), B = new THREE.Vector3(), Tp = new THREE.Vector3().subVectors(pontos[1], pontos[0]).normalize();
@@ -79,7 +79,7 @@ function cacho(raiz, normal, rnd, { comprimento, raioMola, espessura, passoVolta
   }
   const curva = new THREE.CatmullRomCurve3(caminho);
   const voltas = comprimento / passoVolta;
-  const amostras = Math.max(16, Math.round(voltas * 10));
+  const amostras = Math.max(24, Math.round(voltas * 18));
   const frames = curva.computeFrenetFrames(amostras, false);
   const fase = rnd() * Math.PI * 2;
   const pts = [];
@@ -119,19 +119,19 @@ export function criarCachos(base, mat) {
   const K = CABECA.escala;
   const evitar = (q) => (q.z > 0.045 && Math.abs(q.x) < 0.085 && q.y > 0.03 && q.y < 0.19) || q.y < limiteCabelo(q.z / K) * K + 0.012
     || (q.z > 0.0 && Math.abs(q.x) < 0.058 && q.y < 0.02); // frente do pescoço livre
-  for (let k = 0; k < 60000 && partes.length < 520; k++) {
+  for (let k = 0; k < 80000 && partes.length < 300; k++) {
     const i = Math.floor(rnd() * pos.count);
     p.fromBufferAttribute(pos, i);
     n.fromBufferAttribute(nor, i).normalize();
     if (n.y < -0.55) continue; // parte de baixo do volume (escondida)
-    if (usados.some((u) => u.distanceToSquared(p) < 0.0002)) continue; // espaçamento ~1,4 cm
+    if (usados.some((u) => u.distanceToSquared(p) < 0.00045)) continue; // espaçamento ~2,1 cm
     const raiz = p.clone().addScaledVector(n, -0.008);
     const baixo = Math.max(0, 0.15 - p.y) * 1.5; // na parte de baixo: cachos um pouco mais longos
     const c = cacho(raiz, n.clone(), rnd, {
-      comprimento: 0.045 + rnd() * 0.03 + baixo * 0.05,
-      raioMola: 0.009 + rnd() * 0.004, // cachos largos e soltos, como nas fotos
-      espessura: 0.0055 + rnd() * 0.0018,
-      passoVolta: 0.02 + rnd() * 0.006,
+      comprimento: 0.05 + rnd() * 0.03 + baixo * 0.05,
+      raioMola: 0.011 + rnd() * 0.004, // mechas largas e definidas
+      espessura: 0.0092 + rnd() * 0.0025, // grossas e lisas, estilo desenho animado
+      passoVolta: 0.034 + rnd() * 0.008,
       evitar,
     });
     if (!c) continue;

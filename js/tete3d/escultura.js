@@ -61,7 +61,7 @@ const BOLHAS = (() => {
   const rnd = aleatorio(31);
   const lista = [];
   const H = [0, 0.13, -0.012];
-  for (let i = 0; i < 3000 && lista.length < 140; i++) {
+  for (let i = 0; i < 3000 && lista.length < 95; i++) {
     const u = rnd() * 2 - 1, th = rnd() * Math.PI * 2;
     const r = Math.sqrt(1 - u * u);
     const nx = r * Math.cos(th), ny = u, nz = r * Math.sin(th);
@@ -74,7 +74,7 @@ const BOLHAS = (() => {
       H[1] + ny * (ny > 0 ? 0.098 : 0.25),
       H[2] + nz * 0.102 - desce * 0.015,
     ];
-    lista.push([c, 0.034 + rnd() * 0.014 - desce * 0.008]);
+    lista.push([c, 0.042 + rnd() * 0.012 - desce * 0.008]); // lóbulos grandes: volume liso, estilo animação
   }
   return lista;
 })();
@@ -93,7 +93,7 @@ function sdfCabeloBase(x, y, z) {
   let d = 1;
   for (const [c, r] of BOLHAS) {
     const e = esfera(x, y, z, c, r);
-    if (e < d + 0.03) d = smin(d, e, 0.028);
+    if (e < d + 0.05) d = smin(d, e, 0.045);
   }
   // linha do cabelo e rosto livres
   d = ssub(d, elipsoide(x, y, z, [0, 0.092, 0.07], [0.084, 0.105, 0.078]), 0.014);
@@ -192,7 +192,6 @@ export function criarEscultura() {
     let d = tronco(x, y, z, 0.006);
     d = smin(d, elipsoide(x, y, z, [0, 1.072, 0.004], [0.126, 0.038, 0.092]), 0.03); // blusa "bufante" sobre a saia
     // franzido abaixo da pala dos ombros (pregas suaves)
-    d += 0.0011 * Math.sin(x * 230) * suave(1.27, 1.37, y) * (1 - suave(1.41, 1.45, y));
     // decote em V na frente + abertura arredondada do pescoço
     const k = 2.0, n = Math.hypot(1, k);
     const dentroV = Math.max(-(y - k * x - yV) / n, -(y + k * x - yV) / n, 0.035 - z);
@@ -261,7 +260,6 @@ export function criarEscultura() {
       d = smin(d, cone(x, y, z, inicioPunho, fimPunho, 0.031, 0.031), 0.014); // punho de elástico (liso, por cima do pulso)
       // pregas suaves só no corpo da manga (o punho fica liso, sem borda ondulada)
       const ate = Math.hypot(x - W[0], y - W[1], z - W[2]);
-      d += 0.0012 * Math.sin((x * 0.6 + z) * 260 + y * 40) * suave(0.0, 0.02, Math.hypot(x - E[0], y - E[1], z - E[2])) * suave(0.06, 0.09, ate);
       return d;
     }
     const corrManga = [
